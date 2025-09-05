@@ -114,6 +114,131 @@ Reset password with token.
 
 ---
 
+## Member Authentication Endpoints
+
+### POST /member/auth/login
+Login member and get access token.
+
+**Request Body:**
+```json
+{
+    "email": "member@example.com",
+    "password": "password123",
+    "remember": false
+}
+```
+
+**Response:**
+```json
+{
+    "success": true,
+    "message": "Login successful",
+    "data": {
+        "member": {
+            "id": 1,
+            "name": "John Doe",
+            "email": "member@example.com",
+            "membership_type": "basic",
+            "membership_status": "active",
+            "points_balance": "100.00",
+            "total_spent": "500.00"
+        },
+        "token": "1|abc123...",
+        "token_type": "Bearer"
+    }
+}
+```
+
+### POST /member/auth/register
+Register new member.
+
+**Request Body:**
+```json
+{
+    "name": "John Doe",
+    "email": "member@example.com",
+    "password": "password123",
+    "password_confirmation": "password123",
+    "phone": "+1234567890",
+    "date_of_birth": "1990-01-01",
+    "gender": "male",
+    "address": "123 Main St",
+    "city": "New York",
+    "state": "NY",
+    "postal_code": "10001",
+    "country": "United States"
+}
+```
+
+### POST /member/auth/logout
+Logout member and revoke token. **Requires authentication.**
+
+### POST /member/auth/refresh
+Refresh member access token. **Requires authentication.**
+
+### GET /member/auth/me
+Get authenticated member profile. **Requires authentication.**
+
+### PUT /member/profile
+Update member profile. **Requires authentication.**
+
+**Request Body:**
+```json
+{
+    "name": "John Doe",
+    "email": "newemail@example.com",
+    "phone": "+1234567890",
+    "address": "456 New St",
+    "city": "Los Angeles",
+    "state": "CA"
+}
+```
+
+### GET /member/benefits
+Get member's membership benefits. **Requires authentication.**
+
+**Response:**
+```json
+{
+    "success": true,
+    "data": {
+        "membership_level": "silver",
+        "membership_type": "premium",
+        "benefits": ["priority_support", "newsletter", "free_shipping", "early_access"],
+        "points_balance": "100.00",
+        "total_spent": "500.00"
+    }
+}
+```
+
+### GET /member/orders
+Get member's order history. **Requires authentication.**
+
+### POST /member/auth/password/reset
+Send password reset link for member.
+
+**Request Body:**
+```json
+{
+    "email": "member@example.com"
+}
+```
+
+### POST /member/auth/password/reset/token
+Reset member password with token.
+
+**Request Body:**
+```json
+{
+    "token": "reset-token",
+    "email": "member@example.com",
+    "password": "newpassword123",
+    "password_confirmation": "newpassword123"
+}
+```
+
+---
+
 ## Product Endpoints
 
 ### GET /products

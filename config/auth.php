@@ -40,6 +40,18 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'member' => [
+            'driver' => 'session',
+            'provider' => 'members',
+        ],
+        'api' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
+        'member-api' => [
+            'driver' => 'sanctum',
+            'provider' => 'members',
+        ],
     ],
 
     /*
@@ -64,10 +76,18 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
+        'members' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Member::class,
+        ],
 
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
+        // ],
+        // 'members' => [
+        //     'driver' => 'database',
+        //     'table' => 'members',
         // ],
     ],
 
@@ -94,6 +114,12 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'members' => [
+            'provider' => 'members',
+            'table' => 'member_password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],

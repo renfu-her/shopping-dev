@@ -9,7 +9,7 @@ class OrdersChartWidget extends ChartWidget
 {
     protected ?string $heading = 'Orders Over Time';
 
-    protected ?int $sort = 2;
+    protected static ?int $sort = 2;
 
     protected function getData(): array
     {

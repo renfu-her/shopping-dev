@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\MemberController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
@@ -27,6 +28,12 @@ Route::prefix('v1')->group(function () {
     Route::post('/auth/password/reset', [AuthController::class, 'sendPasswordResetLink']);
     Route::post('/auth/password/reset/token', [AuthController::class, 'resetPassword']);
 
+    // Member authentication routes
+    Route::post('/member/auth/login', [MemberController::class, 'login']);
+    Route::post('/member/auth/register', [MemberController::class, 'register']);
+    Route::post('/member/auth/password/reset', [MemberController::class, 'sendPasswordResetLink']);
+    Route::post('/member/auth/password/reset/token', [MemberController::class, 'resetPassword']);
+
     // Product routes (public)
     Route::get('/products', [ProductController::class, 'index']);
     Route::get('/products/featured', [ProductController::class, 'featured']);
@@ -51,6 +58,14 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
     Route::get('/auth/me', [AuthController::class, 'me']);
+
+    // Member authentication routes
+    Route::post('/member/auth/logout', [MemberController::class, 'logout']);
+    Route::post('/member/auth/refresh', [MemberController::class, 'refresh']);
+    Route::get('/member/auth/me', [MemberController::class, 'me']);
+    Route::put('/member/profile', [MemberController::class, 'updateProfile']);
+    Route::get('/member/benefits', [MemberController::class, 'benefits']);
+    Route::get('/member/orders', [MemberController::class, 'orders']);
 
     // User routes
     Route::get('/user/profile', [UserController::class, 'profile']);
