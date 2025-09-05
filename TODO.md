@@ -6,37 +6,37 @@ A comprehensive shopping cart system with Filament v4 backend, user authenticati
 ## 🗄️ Database & Models Setup
 
 ### 1. Database Migrations
-- [ ] Create `products` table
+- [x] Create `products` table
   - id, name, description, price, stock_quantity, image, status, created_at, updated_at
-- [ ] Create `categories` table
+- [x] Create `categories` table
   - id, name, slug, description, image, parent_id, created_at, updated_at
-- [ ] Create `product_categories` pivot table
-- [ ] Create `carts` table
+- [x] Create `product_categories` pivot table
+- [x] Create `carts` table
   - id, user_id, session_id, created_at, updated_at
-- [ ] Create `cart_items` table
+- [x] Create `cart_items` table
   - id, cart_id, product_id, quantity, price, created_at, updated_at
-- [ ] Create `orders` table
+- [x] Create `orders` table
   - id, user_id, order_number, status, total_amount, shipping_address, billing_address, payment_status, created_at, updated_at
-- [ ] Create `order_items` table
+- [x] Create `order_items` table
   - id, order_id, product_id, quantity, price, created_at, updated_at
-- [ ] Create `coupons` table
+- [x] Create `coupons` table
   - id, code, type, value, minimum_amount, maximum_discount, usage_limit, used_count, valid_from, valid_until, status, created_at, updated_at
-- [ ] Create `user_coupons` table (track coupon usage per user)
+- [x] Create `user_coupons` table (track coupon usage per user)
   - id, user_id, coupon_id, used_at, order_id
-- [ ] Create `addresses` table
+- [x] Create `addresses` table
   - id, user_id, type, first_name, last_name, company, address_line_1, address_line_2, city, state, postal_code, country, phone, created_at, updated_at
 
 ### 2. Eloquent Models
-- [ ] Product model with relationships
-- [ ] Category model with relationships
-- [ ] Cart model with relationships
-- [ ] CartItem model with relationships
-- [ ] Order model with relationships
-- [ ] OrderItem model with relationships
-- [ ] Coupon model with relationships
-- [ ] UserCoupon model with relationships
-- [ ] Address model with relationships
-- [ ] Update User model with new relationships
+- [x] Product model with relationships
+- [x] Category model with relationships
+- [x] Cart model with relationships
+- [x] CartItem model with relationships
+- [x] Order model with relationships
+- [x] OrderItem model with relationships
+- [x] Coupon model with relationships
+- [x] UserCoupon model with relationships
+- [x] Address model with relationships
+- [x] Update User model with new relationships
 
 ## 🎛️ Filament v4 Backend Resources
 
