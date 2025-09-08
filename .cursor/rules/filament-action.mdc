@@ -1,0 +1,917 @@
+---
+alwaysApply: true
+---
+# Filament v4 Complete Guide - Part 6: Actions & Navigation
+
+## Action System
+
+### Overview
+**v4 Action System Features:**
+- Supports multiple action types and trigger methods
+- Modal and full-page action support
+- Action grouping and organization functionality
+- Highly customizable action logic
+- Supports bulk actions and single record actions
+- Real-time feedback and notification system
+
+## Basic Action Types
+
+### Create Action
+**Features:**
+- Form action for creating new records
+- Supports custom forms and validation
+- Customizable redirects and notifications
+- Supports post-creation action chains
+
+**Example Code:**
+```php
+use Filament\Actions\CreateAction;
+
+CreateAction::make()
+    ->label('Create New User')
+    ->icon('heroicon-o-plus')
+    ->form([
+        TextInput::make('name')->required(),
+        TextInput::make('email')->email()->required(),
+        Select::make('role')->options([
+            'admin' => 'Administrator',
+            'user' => 'User',
+        ])->required(),
+    ])
+    ->action(function (array $data) {
+        $user = User::create($data);
+        
+        // Send welcome email
+        Mail::to($user->email)->send(new WelcomeMail($user));
+        
+        return $user;
+    })
+    ->successNotification(
+        Notification::make()
+            ->success()
+            ->title('User created successfully')
+            ->body('The user has been created and a welcome email has been sent.')
+    )
+    ->after(function ($record) {
+        // Post-creation actions
+        activity()->log("Created user: {$record->name}");
+    });
+```
+
+### Edit Action
+**Features:**
+- Form action for editing existing records
+- Supports custom forms and validation
+- Customizable save logic
+- Supports post-edit actions
+
+**Example Code:**
+```php
+use Filament\Actions\EditAction;
+
+EditAction::make()
+    ->label('Edit User')
+    ->icon('heroicon-o-pencil')
+    ->form([
+        TextInput::make('name')->required(),
+        TextInput::make('email')->email()->required(),
+        Select::make('role')->options([
+            'admin' => 'Administrator',
+            'user' => 'User',
+        ])->required(),
+    ])
+    ->action(function (array $data, $record) {
+        $record->update($data);
+        
+        // Log changes
+        activity()->log("Updated user: {$record->name}");
+        
+        return $record;
+    })
+    ->successNotification(
+        Notification::make()
+            ->success()
+            ->title('User updated successfully')
+            ->body('The user information has been updated.')
+    );
+```
+
+### View Action
+**Features:**
+- Read-only record display action
+- Uses Infolist components to display data
+- Supports custom layouts and styles
+- Can add custom action buttons
+
+**Example Code:**
+```php
+use Filament\Actions\ViewAction;
+
+ViewAction::make()
+    ->label('View Details')
+    ->icon('heroicon-o-eye')
+    ->infolist([
+        TextEntry::make('name')->label('Full Name'),
+        TextEntry::make('email')->label('Email Address'),
+        TextEntry::make('role')->label('Role')->badge(),
+        TextEntry::make('created_at')->label('Created At')->dateTime(),
+    ])
+    ->modalHeading('User Details')
+    ->modalDescription('View detailed information about this user.')
+    ->modalSubmitAction(false) // Hide submit button
+    ->modalCancelActionLabel('Close');
+```
+
+### Delete Action
+**Features:**
+- Confirmation action for deleting records
+- Supports soft delete and hard delete
+- Customizable delete logic
+- Supports bulk deletion
+
+**Example Code:**
+```php
+use Filament\Actions\DeleteAction;
+
+DeleteAction::make()
+    ->label('Delete User')
+    ->icon('heroicon-o-trash')
+    ->color('danger')
+    ->requiresConfirmation()
+    ->modalHeading('Delete User')
+    ->modalDescription('Are you sure you want to delete this user? This action cannot be undone.')
+    ->modalSubmitActionLabel('Yes, delete user')
+    ->action(function ($record) {
+        // Custom delete logic
+        if ($record->hasActiveOrders()) {
+            throw new \Exception('Cannot delete user with active orders.');
+        }
+        
+        $record->delete();
+        
+        // Log delete operation
+        activity()->log("Deleted user: {$record->name}");
+    })
+    ->successNotification(
+        Notification::make()
+            ->success()
+            ->title('User deleted successfully')
+            ->body('The user has been permanently deleted.')
+    );
+```
+
+### Replicate Action
+**Features:**
+- Duplicates existing records
+- Supports custom replication logic
+- Can select which fields to copy
+- Supports relationship data replication
+
+**Example Code:**
+```php
+use Filament\Actions\ReplicateAction;
+
+ReplicateAction::make()
+    ->label('Duplicate User')
+    ->icon('heroicon-o-document-duplicate')
+    ->form([
+        TextInput::make('name')->required(),
+        TextInput::make('email')->email()->required(),
+        Checkbox::make('copy_permissions')->label('Copy user permissions'),
+    ])
+    ->action(function (array $data, $record) {
+        $newUser = $record->replicate();
+        $newUser->name = $data['name'];
+        $newUser->email = $data['email'];
+        $newUser->save();
+        
+        // Copy permissions
+        if ($data['copy_permissions']) {
+            $newUser->permissions()->attach($record->permissions);
+        }
+        
+        return $newUser;
+    })
+    ->successNotification(
+        Notification::make()
+            ->success()
+            ->title('User duplicated successfully')
+            ->body('A new user has been created based on the original.')
+    );
+```
+
+### Force Delete Action
+**Features:**
+- Permanently deletes soft-deleted records
+- Bypasses soft delete protection
+- Supports bulk force deletion
+- Customizable delete logic
+
+**Example Code:**
+```php
+use Filament\Actions\ForceDeleteAction;
+
+ForceDeleteAction::make()
+    ->label('Permanently Delete')
+    ->icon('heroicon-o-trash')
+    ->color('danger')
+    ->requiresConfirmation()
+    ->modalHeading('Permanently Delete User')
+    ->modalDescription('This will permanently delete the user and all associated data. This action cannot be undone.')
+    ->modalSubmitActionLabel('Yes, permanently delete')
+    ->visible(fn ($record) => $record->trashed())
+    ->action(function ($record) {
+        $record->forceDelete();
+        
+        activity()->log("Permanently deleted user: {$record->name}");
+    });
+```
+
+### Restore Action
+**Features:**
+- Restores soft-deleted records
+- Supports bulk restoration
+- Customizable restore logic
+- Automatically handles timestamps
+
+**Example Code:**
+```php
+use Filament\Actions\RestoreAction;
+
+RestoreAction::make()
+    ->label('Restore User')
+    ->icon('heroicon-o-arrow-path')
+    ->color('success')
+    ->visible(fn ($record) => $record->trashed())
+    ->action(function ($record) {
+        $record->restore();
+        
+        activity()->log("Restored user: {$record->name}");
+    })
+    ->successNotification(
+        Notification::make()
+            ->success()
+            ->title('User restored successfully')
+            ->body('The user has been restored and is now active again.')
+    );
+```
+
+### Import Action
+**Features:**
+- Bulk import of records
+- Supports multiple file formats
+- Customizable import logic
+- Error handling and reporting
+
+**Example Code:**
+```php
+use Filament\Actions\ImportAction;
+
+ImportAction::make()
+    ->label('Import Users')
+    ->icon('heroicon-o-arrow-up-tray')
+    ->form([
+        FileUpload::make('file')
+            ->label('CSV File')
+            ->acceptedFileTypes(['text/csv'])
+            ->required(),
+        Checkbox::make('skip_duplicates')
+            ->label('Skip duplicate emails')
+            ->default(true),
+    ])
+    ->action(function (array $data) {
+        $file = $data['file'];
+        $skipDuplicates = $data['skip_duplicates'];
+        
+        $imported = 0;
+        $skipped = 0;
+        
+        foreach (Csv::fromFile($file) as $row) {
+            if ($skipDuplicates && User::where('email', $row['email'])->exists()) {
+                $skipped++;
+                continue;
+            }
+            
+            User::create([
+                'name' => $row['name'],
+                'email' => $row['email'],
+                'role' => $row['role'] ?? 'user',
+            ]);
+            
+            $imported++;
+        }
+        
+        return [
+            'imported' => $imported,
+            'skipped' => $skipped,
+        ];
+    })
+    ->successNotification(
+        Notification::make()
+            ->success()
+            ->title('Import completed')
+            ->body(fn ($data) => "Imported {$data['imported']} users, skipped {$data['skipped']} duplicates.")
+    );
+```
+
+### Export Action
+**Features:**
+- Bulk export of records
+- Supports multiple file formats
+- Customizable export fields
+- Filtering and sorting support
+
+**Example Code:**
+```php
+use Filament\Actions\ExportAction;
+
+ExportAction::make()
+    ->label('Export Users')
+    ->icon('heroicon-o-arrow-down-tray')
+    ->form([
+        Select::make('format')
+            ->options([
+                'csv' => 'CSV',
+                'xlsx' => 'Excel',
+                'json' => 'JSON',
+            ])
+            ->default('csv')
+            ->required(),
+        CheckboxList::make('fields')
+            ->options([
+                'name' => 'Name',
+                'email' => 'Email',
+                'role' => 'Role',
+                'created_at' => 'Created At',
+            ])
+            ->default(['name', 'email', 'role'])
+            ->required(),
+    ])
+    ->action(function (array $data) {
+        $users = User::select($data['fields'])->get();
+        
+        return match ($data['format']) {
+            'csv' => $users->toCsv(),
+            'xlsx' => $users->toExcel(),
+            'json' => $users->toJson(),
+        };
+    })
+    ->successNotification(
+        Notification::make()
+            ->success()
+            ->title('Export completed')
+            ->body('Your file has been generated and is ready for download.')
+    );
+```
+
+## Advanced Features
+
+### Action Groups
+**Organize related actions:**
+```php
+use Filament\Actions\ActionGroup;
+
+ActionGroup::make([
+    ViewAction::make(),
+    EditAction::make(),
+    DeleteAction::make(),
+])
+    ->label('Actions')
+    ->icon('heroicon-m-ellipsis-vertical')
+    ->color('gray')
+    ->dropdownPlacement('bottom-end');
+```
+
+### Bulk Actions
+**Execute actions on multiple records:**
+```php
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\BulkAction;
+
+BulkActionGroup::make([
+    BulkAction::make('activate')
+        ->label('Activate Selected')
+        ->icon('heroicon-o-check-circle')
+        ->color('success')
+        ->action(function ($records) {
+            $records->each->update(['is_active' => true]);
+        }),
+    BulkAction::make('deactivate')
+        ->label('Deactivate Selected')
+        ->icon('heroicon-o-x-circle')
+        ->color('danger')
+        ->action(function ($records) {
+            $records->each->update(['is_active' => false]);
+        }),
+    BulkAction::make('delete')
+        ->label('Delete Selected')
+        ->icon('heroicon-o-trash')
+        ->color('danger')
+        ->requiresConfirmation()
+        ->action(function ($records) {
+            $records->each->delete();
+        }),
+]);
+```
+
+### Conditional Actions
+**Display actions based on record state:**
+```php
+EditAction::make()
+    ->visible(fn ($record) => $record->status !== 'archived')
+    ->disabled(fn ($record) => $record->is_locked);
+
+DeleteAction::make()
+    ->visible(fn ($record) => auth()->user()->can('delete', $record))
+    ->requiresConfirmation(fn ($record) => $record->has_important_data);
+```
+
+### Custom Actions
+**Create completely custom actions:**
+```php
+use Filament\Actions\Action;
+
+Action::make('send_notification')
+    ->label('Send Notification')
+    ->icon('heroicon-o-bell')
+    ->color('warning')
+    ->form([
+        TextInput::make('subject')->required(),
+        Textarea::make('message')->required(),
+    ])
+    ->action(function (array $data, $record) {
+        $record->notify(new CustomNotification($data['subject'], $data['message']));
+    })
+    ->successNotification(
+        Notification::make()
+            ->success()
+            ->title('Notification sent')
+            ->body('The notification has been sent successfully.')
+    );
+```
+
+## Best Practices
+
+### Performance Optimization
+- Use appropriate database queries
+- Avoid N+1 query problems
+- Use bulk operations reasonably
+
+### User Experience
+- Provide clear confirmation dialogs
+- Use appropriate icons and colors
+- Provide detailed success/error messages
+
+### Security
+- Implement appropriate permission checks
+- Validate all user input
+- Log important operations
+
+## Navigation System
+
+### Overview
+**Navigation System Features:**
+- By default, Filament registers navigation items for each resource, custom page, and cluster
+- These classes contain static properties and methods that you can override to configure navigation items
+- If you want to add a second layer of navigation to your application, you can use clusters to group resources and pages together
+
+### Custom Navigation Item Labels
+
+**Custom Navigation Label:**
+```php
+protected static ?string $navigationLabel = 'Custom Navigation Label';
+```
+
+**Dynamic Label:**
+```php
+public static function getNavigationLabel(): string
+{
+    return __('navigation.users');
+}
+```
+
+### Custom Navigation Item Icons
+
+**Set Navigation Icon:**
+```php
+protected static ?string $navigationIcon = 'heroicon-o-users';
+```
+
+**Dynamic Icon:**
+```php
+public static function getNavigationIcon(): ?string
+{
+    return 'heroicon-o-users';
+}
+```
+
+**Switch Icon When Navigation Item is Active:**
+```php
+protected static ?string $navigationActiveIcon = 'heroicon-o-users';
+```
+
+### Sort Navigation Items
+
+**Set Navigation Sort:**
+```php
+protected static ?int $navigationSort = 1;
+```
+
+**Dynamic Sort:**
+```php
+public static function getNavigationSort(): ?int
+{
+    return 1;
+}
+```
+
+### Add Badges to Navigation Items
+
+**Add Badge:**
+```php
+protected static ?string $navigationBadge = 'New';
+```
+
+**Dynamic Badge:**
+```php
+public static function getNavigationBadge(): ?string
+{
+    return User::count();
+}
+```
+
+**Badge Color:**
+```php
+protected static ?string $navigationBadgeColor = 'success';
+```
+
+**Badge Tooltip:**
+```php
+protected static ?string $navigationBadgeTooltip = 'New users this week';
+```
+
+### Group Navigation Items
+
+**Use Navigation Group:**
+```php
+protected static ?string $navigationGroup = 'User Management';
+```
+
+**Dynamic Group:**
+```php
+public static function getNavigationGroup(): ?string
+{
+    return __('navigation.user_management');
+}
+```
+
+**Group Other Items Under Navigation Group:**
+```php
+protected static ?string $navigationParentItem = 'settings';
+```
+
+**Custom Navigation Group:**
+```php
+use Filament\Navigation\NavigationGroup;
+
+NavigationGroup::make('Website')
+    ->icon('heroicon-o-globe-alt')
+    ->collapsed();
+```
+
+**Register Navigation Groups Using Enums:**
+```php
+enum NavigationGroup: string
+{
+    case Website = 'website';
+    case Settings = 'settings';
+}
+
+// Use in resource
+protected static ?string $navigationGroup = NavigationGroup::Website->value;
+```
+
+### Collapsible Sidebar on Desktop
+
+**Enable Desktop Collapse:**
+```php
+use Filament\Panel;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        ->sidebarCollapsibleOnDesktop();
+}
+```
+
+**Navigation Groups in Desktop Collapsible Sidebar:**
+```php
+NavigationGroup::make('Website')
+    ->collapsed();
+```
+
+### Register Custom Navigation Items
+
+**Create Custom Navigation Item:**
+```php
+use Filament\Navigation\NavigationItem;
+
+NavigationItem::make('Analytics')
+    ->url('https://filament.pirsch.io', shouldOpenInNewTab: true)
+    ->icon('heroicon-o-presentation-chart-line')
+    ->group('Reports')
+    ->sort(3);
+```
+
+**Dynamic Navigation Item:**
+```php
+NavigationItem::make('dashboard')
+    ->label(fn (): string => __('filament-panels::pages/dashboard.title'))
+    ->url(fn (): string => Dashboard::getUrl())
+    ->isActiveWhen(fn () => original_request()->routeIs('filament.admin.pages.dashboard'));
+```
+
+### Conditionally Hide Navigation Items
+
+**Hide Navigation Items Based on Conditions:**
+```php
+use Filament\Navigation\NavigationItem;
+
+NavigationItem::make('Analytics')
+    ->visible(fn(): bool => auth()->user()->can('view-analytics'))
+    // or
+    ->hidden(fn(): bool => ! auth()->user()->can('view-analytics'));
+```
+
+### Disable Resource or Page Navigation Items
+
+**Prevent Resources or Pages from Showing in Navigation:**
+```php
+protected static bool $shouldRegisterNavigation = false;
+```
+
+**Or Override Method:**
+```php
+public static function shouldRegisterNavigation(): bool
+{
+    return false;
+}
+```
+
+### Use Top Navigation
+
+**Configure Top Navigation:**
+```php
+use Filament\Panel;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        ->topNavigation();
+}
+```
+
+### Custom Sidebar Width
+
+**Set Sidebar Width:**
+```php
+use Filament\Panel;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        ->sidebarWidth('40rem');
+}
+```
+
+**Custom Collapsed Icon Width:**
+```php
+use Filament\Panel;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        ->sidebarCollapsibleOnDesktop()
+        ->collapsedSidebarWidth('9rem');
+}
+```
+
+### Advanced Navigation Customization
+
+**Build Custom Navigation:**
+```php
+use App\Filament\Pages\Settings;
+use App\Filament\Resources\Users\UserResource;
+use Filament\Navigation\NavigationBuilder;
+use Filament\Navigation\NavigationItem;
+use Filament\Pages\Dashboard;
+use Filament\Panel;
+use function Filament\Support\original_request;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        ->navigation(function (NavigationBuilder $builder): NavigationBuilder {
+            return $builder->items([
+                NavigationItem::make('Dashboard')
+                    ->icon('heroicon-o-home')
+                    ->isActiveWhen(fn (): bool => original_request()->routeIs('filament.admin.pages.dashboard'))
+                    ->url(fn (): string => Dashboard::getUrl()),
+                ...UserResource::getNavigationItems(),
+                ...Settings::getNavigationItems(),
+            ]);
+        });
+}
+```
+
+**Register Custom Navigation Groups:**
+```php
+use App\Filament\Pages\HomePageSettings;
+use App\Filament\Resources\Categories\CategoryResource;
+use App\Filament\Resources\Pages\PageResource;
+use Filament\Navigation\NavigationBuilder;
+use Filament\Navigation\NavigationGroup;
+use Filament\Panel;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        ->navigation(function (NavigationBuilder $builder): NavigationBuilder {
+            return $builder->groups([
+                NavigationGroup::make('Website')
+                    ->items([
+                        ...PageResource::getNavigationItems(),
+                        ...CategoryResource::getNavigationItems(),
+                        ...HomePageSettings::getNavigationItems(),
+                    ]),
+            ]);
+        });
+}
+```
+
+### Disable Navigation
+
+**Completely Disable Navigation:**
+```php
+use Filament\Panel;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        ->navigation(false);
+}
+```
+
+### Disable Top Bar
+
+**Disable Top Bar:**
+```php
+use Filament\Panel;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        ->topbar(false);
+}
+```
+
+### Replace Sidebar and Top Bar Livewire Components
+
+**Use Custom Components:**
+```php
+use App\Livewire\Sidebar;
+use App\Livewire\Topbar;
+use Filament\Panel;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        ->sidebarLivewireComponent(Sidebar::class)
+        ->topbarLivewireComponent(Topbar::class);
+}
+```
+
+### Disable Breadcrumbs
+
+**Disable Breadcrumbs:**
+```php
+use Filament\Panel;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        ->breadcrumbs(false);
+}
+```
+
+### Reload Sidebar and Top Bar
+
+**Dispatch Event from PHP:**
+```php
+// In any Livewire component
+$this->dispatch('refresh-sidebar');
+
+// In custom action
+use Filament\Actions\Action;
+use Livewire\Component;
+
+Action::make('create')
+    ->action(function (Component $livewire) {
+        // ...
+    
+        $livewire->dispatch('refresh-sidebar');
+    });
+```
+
+**Dispatch Event from JavaScript:**
+```html
+<!-- Using Alpine.js -->
+<button x-on:click="$dispatch('refresh-sidebar')" type="button">
+    Refresh Sidebar
+</button>
+
+<!-- Using native JavaScript -->
+<script>
+window.dispatchEvent(new CustomEvent('refresh-sidebar'));
+</script>
+```
+
+## Navigation Best Practices
+
+### Organization Principles
+- **Logical Grouping**: Organize related functionality together
+- **Hierarchy**: Use appropriate hierarchy to organize navigation
+- **Consistency**: Maintain consistency in navigation labels and icons
+- **Simplicity**: Avoid too many navigation items
+
+### User Experience
+- **Clear Labels**: Use descriptive navigation labels
+- **Appropriate Icons**: Choose meaningful icons
+- **Visual Feedback**: Provide appropriate active state indicators
+- **Responsive Design**: Ensure usability on mobile devices
+
+### Performance Considerations
+- **Conditional Rendering**: Use conditional display appropriately
+- **Permission Control**: Display navigation items based on user permissions
+- **Caching Strategy**: Consider caching for navigation items
+
+### Accessibility
+- **Keyboard Navigation**: Ensure all navigation items are accessible via keyboard
+- **Screen Readers**: Provide appropriate ARIA labels
+- **Color Contrast**: Ensure sufficient color contrast
+- **Focus Management**: Properly manage focus states
+
+## Navigation Configuration Example
+
+**Complete navigation configuration example:**
+```php
+use Filament\Panel;
+use Filament\Navigation\NavigationBuilder;
+use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\NavigationItem;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        ->navigation(function (NavigationBuilder $builder): NavigationBuilder {
+            return $builder
+                ->groups([
+                    NavigationGroup::make('Content Management')
+                        ->icon('heroicon-o-document-text')
+                        ->items([
+                            ...PageResource::getNavigationItems(),
+                            ...PostResource::getNavigationItems(),
+                            ...CategoryResource::getNavigationItems(),
+                        ]),
+                    NavigationGroup::make('User Management')
+                        ->icon('heroicon-o-users')
+                        ->items([
+                            ...UserResource::getNavigationItems(),
+                            ...RoleResource::getNavigationItems(),
+                        ]),
+                    NavigationGroup::make('Settings')
+                        ->icon('heroicon-o-cog-6-tooth')
+                        ->items([
+                            ...Settings::getNavigationItems(),
+                        ]),
+                ])
+                ->items([
+                    NavigationItem::make('Analytics')
+                        ->url('https://analytics.example.com')
+                        ->icon('heroicon-o-chart-bar')
+                        ->group('Reports')
+                        ->visible(fn(): bool => auth()->user()->can('view-analytics')),
+                ]);
+        })
+        ->sidebarCollapsibleOnDesktop()
+        ->sidebarWidth('20rem')
+        ->collapsedSidebarWidth('5rem');
+}
+```
+
+This navigation system provides powerful customization capabilities, allowing you to create intuitive and user-friendly admin interface navigation structures.
+
+---
+
+**Previous:** [Part 5: Schema System](FILAMENT-05-SCHEMAS.md)  
+**Complete Guide:** [Part 1: Overview & Architecture](FILAMENT-01-OVERVIEW.md)

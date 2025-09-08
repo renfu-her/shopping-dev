@@ -7,6 +7,9 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -114,21 +117,21 @@ class OrdersTable
                     }),
             ])
             ->actions([
-                \Filament\Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
-                \Filament\Tables\Actions\Action::make('mark_shipped')
+                Action::make('mark_shipped')
                     ->label('Mark as Shipped')
                     ->icon('heroicon-o-truck')
                     ->color('success')
                     ->visible(fn (Order $record): bool => $record->canBeShipped())
                     ->action(fn (Order $record) => $record->markAsShipped()),
-                \Filament\Tables\Actions\Action::make('mark_delivered')
+                Action::make('mark_delivered')
                     ->label('Mark as Delivered')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->visible(fn (Order $record): bool => $record->canBeDelivered())
                     ->action(fn (Order $record) => $record->markAsDelivered()),
-                \Filament\Tables\Actions\Action::make('cancel')
+                Action::make('cancel')
                     ->label('Cancel Order')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
@@ -139,7 +142,7 @@ class OrdersTable
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    \Filament\Tables\Actions\BulkAction::make('mark_processing')
+                    BulkAction::make('mark_processing')
                         ->label('Mark as Processing')
                         ->icon('heroicon-o-cog-6-tooth')
                         ->color('info')

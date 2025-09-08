@@ -1,0 +1,160 @@
+### Install Laravel
+
+- Initially use SQLite  
+
+```
+composer create-project --prefer-dist laravel/laravel .
+```
+
+### Install Packages
+
+#### Image Processing
+
+```
+composer require intervention/image
+```
+
+### Install Filament
+
+```
+composer require filament/filament
+php artisan filament:install --panels
+php artisan vendor:publish --tag=filament-config
+```
+
+#### Install Plugins
+
+```
+composer require coolsam/flatpickr:^3.2
+php artisan vendor:publish --tag="coolsam-flatpickr-config"
+```
+
+#### Add TinyMCE
+  
+- Installation
+```
+composer require mohamedsabil83/filament-forms-tinyeditor
+php artisan vendor:publish --tag="filament-forms-tinyeditor-config"
+```
+
+- Usage
+
+```
+use Mohamedsabil83\FilamentFormsTinyeditor\Components\TinyEditor;
+TinyEditor::make('content')
+```
+
+#### Other Processing
+  
+### Setup Filament Account
+
+  
+
+```
+php artisan make:filament-user
+```
+
+### Copy Translation Files
+  
+Copy the filament_lang from the documentation
+
+# Laravel PHP Cursor Rules - English Translation
+
+## 🎯 Core Principles
+  
+- Write concise, technically accurate responses with correct PHP examples.
+- Follow Laravel best practices and conventions.
+- Adopt object-oriented programming and focus on SOLID principles.
+- Prefer iteration and modularization, avoid code duplication.
+- Use descriptive variable and method names.
+- Directory naming uses lowercase with hyphens (e.g., `app/Http/Controllers`).
+- Prefer dependency injection and service container.
+
+---
+
+## 🧱 PHP/Laravel Practices
+
+- Use PHP 8.1+ new features appropriately (e.g., typed properties, `match` expressions).
+- Follow PSR-12 coding standards.
+- Enable strict types: `declare(strict_types=1);`
+- Leverage Laravel's built-in features and helper functions whenever possible.
+- Follow Laravel's directory structure and naming conventions.
+- Implement appropriate error handling and logging:
+    - Use Laravel's exception handling and logging features.
+    - Create custom exceptions when necessary.
+    - Use `try-catch` blocks for expected exceptions.
+- Use Laravel's validation features for form and request validation.
+- Implement middleware for request filtering and modification.
+- Use Laravel's Eloquent ORM for database interactions.
+- For complex database queries, use Laravel's query builder.
+- Implement appropriate database migrations and seeders.
+
+---
+
+## 📦 Dependencies
+
+- Laravel (latest stable version)
+- Composer (for dependency management)
+
+---
+
+## ✅ Laravel Best Practices
+
+- Use Eloquent ORM whenever possible, avoid raw SQL queries.
+- Implement Repository Pattern as the data access layer.
+- Use Laravel's built-in authentication and authorization features.
+- Leverage Laravel's caching mechanisms for performance.
+- For long-running tasks, implement job queues.
+- Use Laravel's built-in testing tools (PHPUnit, Dusk) for unit and functional testing.
+- For public APIs, implement API versioning.
+- Use Laravel's localization features for multi-language support.
+- Implement appropriate CSRF protection and security measures.
+- Use Laravel Mix for asset compilation.
+- Implement appropriate database indexes for query performance.
+- Use Laravel's built-in pagination features.
+- Implement appropriate error logging and monitoring.
+
+---
+
+## 📐 Key Conventions
+
+1. Follow Laravel's MVC architecture.
+2. Use Laravel's routing system to define application endpoints.
+3. Use Form Requests for appropriate request validation.
+4. Use Laravel's Blade templating engine for view rendering.
+5. Use Eloquent to implement appropriate database relationships.
+6. Use Laravel's built-in authentication scaffolding.
+7. Implement appropriate API resource transformations.
+8. Use Laravel's event and listener system for decoupled code.
+9. Implement appropriate database transactions to ensure data integrity.
+10. Use Laravel's built-in scheduling features for periodic tasks.
+
+---
+
+## Special Configuration
+
+- Do not apply CSRF protection, use except in validateCsrfTokens
+
+```
+<?php
+
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+    )
+    ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->validateCsrfTokens(except: [
+            '/payment/result',
+            '/payment/notify'
+        ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions): void {
+        //
+    })->create();
+```

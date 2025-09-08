@@ -1,0 +1,633 @@
+---
+alwaysApply: true
+---
+# Filament v4 Complete Guide - Part 4: Infolists
+
+## Infolists
+
+### Overview
+**Brand New Feature in v4:**
+- Specialized system for read-only display of record information
+- Replaces traditional detail views with better user experience
+- Supports multiple layouts and styles, highly customizable
+- Based on Schema system, shares components with forms and infolists
+- Supports responsive design and conditional display
+- Integrated into panel resources, relation managers, and action modals
+- Suitable for custom Livewire applications
+
+## Core Concepts
+
+### Defining Entries
+**Entries are the basic building blocks of infolists:**
+```php
+use Filament\Infolists\Components\TextEntry;
+
+TextEntry::make('name')
+    ->label('Full Name')
+    ->size(TextEntry\TextEntrySize::Large);
+```
+
+### Entry Content/State
+**Setting entry content and state:**
+
+**Direct use of model attributes:**
+```php
+TextEntry::make('name')  // Automatically uses the model's name attribute
+```
+
+**Custom state:**
+```php
+TextEntry::make('display_name')
+    ->state(fn ($record) => "{$record->first_name} {$record->last_name}")
+```
+
+**Default state:**
+```php
+TextEntry::make('status')
+    ->default('No status set')
+```
+
+### Entry Labels
+**Setting and customizing entry labels:**
+
+**Custom labels:**
+```php
+TextEntry::make('email')
+    ->label('Email Address')
+```
+
+**Hide labels:**
+```php
+TextEntry::make('name')
+    ->label(false)
+```
+
+**Dynamic labels:**
+```php
+TextEntry::make('name')
+    ->label(fn (string $state): string => str_contains($state, ' ') ? 'Full name' : 'Name')
+```
+
+### Click Entry to Open URL
+**Adding click behavior to entries:**
+```php
+TextEntry::make('email')
+    ->url(fn ($state) => "mailto:{$state}")
+    ->openUrlInNewTab();
+
+TextEntry::make('website')
+    ->url(fn ($state) => $state)
+    ->openUrlInNewTab();
+```
+
+### Hiding Entries
+**Conditionally hiding entries:**
+
+**Based on record state:**
+```php
+TextEntry::make('admin_notes')
+    ->hidden(fn ($record) => $record->role !== 'admin')
+```
+
+**Based on operation type:**
+```php
+TextEntry::make('internal_id')
+    ->hidden(fn (string $operation) => $operation === 'view')
+```
+
+**Based on entry state:**
+```php
+TextEntry::make('sensitive_data')
+    ->hidden(fn ($state) => empty($state))
+```
+
+### Inline Labels
+**Using inline label styles:**
+
+**Single entry:**
+```php
+TextEntry::make('name')
+    ->inlineLabel()
+```
+
+**Global settings:**
+```php
+// In service provider
+TextEntry::configureUsing(function (TextEntry $entry): void {
+    $entry->inlineLabel();
+});
+```
+
+### Entry Tooltips
+**Adding tooltips to entries:**
+```php
+TextEntry::make('status')
+    ->tooltip('Current user status')
+    ->tooltipIcon('heroicon-m-information-circle');
+```
+
+### Content Alignment
+**Controlling entry content alignment:**
+```php
+TextEntry::make('amount')
+    ->alignStart()    // Left align
+    ->alignCenter()   // Center align
+    ->alignEnd()      // Right align
+    ->alignJustify(); // Justify align
+```
+
+### Adding Extra Content
+**Adding extra content at different positions of entries:**
+
+**Above the label:**
+```php
+TextEntry::make('name')
+    ->extraAttributes(['class' => 'font-bold'])
+    ->extraContentAbove(fn ($state) => view('components.user-avatar', ['user' => $state]));
+```
+
+**Before the label:**
+```php
+TextEntry::make('email')
+    ->extraContentBefore(fn ($state) => view('components.email-icon'));
+```
+
+**After the label:**
+```php
+TextEntry::make('status')
+    ->extraContentAfter(fn ($state) => view('components.status-indicator', ['status' => $state]));
+```
+
+**Below the label:**
+```php
+TextEntry::make('description')
+    ->extraContentBelow(fn ($state) => view('components.description-helper'));
+```
+
+**Above the content:**
+```php
+TextEntry::make('content')
+    ->extraContentAbove(fn ($state) => view('components.content-header'));
+```
+
+**Before the content:**
+```php
+TextEntry::make('price')
+    ->extraContentBefore(fn ($state) => '$')
+```
+
+**After the content:**
+```php
+TextEntry::make('price')
+    ->extraContentAfter(fn ($state) => ' USD')
+```
+
+### Adding HTML Attributes
+**Adding custom HTML attributes to entries:**
+
+**For the entry itself:**
+```php
+TextEntry::make('name')
+    ->extraAttributes([
+        'class' => 'font-bold text-primary',
+        'data-testid' => 'user-name',
+    ]);
+```
+
+**For the entry wrapper:**
+```php
+TextEntry::make('slug')
+    ->extraEntryWrapperAttributes(['class' => 'components-locked']);
+```
+
+**Dynamic attributes:**
+```php
+TextEntry::make('status')
+    ->extraAttributes(function ($state, $record) {
+        return [
+            'class' => $state === 'active' ? 'text-success' : 'text-danger',
+            'data-status' => $state,
+        ];
+    });
+```
+
+**Merging attributes:**
+```php
+TextEntry::make('name')
+    ->extraAttributes(['class' => 'base-style'])
+    ->extraAttributes(['class' => 'additional-style'], merge: true);
+```
+
+## Utility Injection
+
+### Inject Current Entry State
+**Accessing the current value of an entry:**
+```php
+TextEntry::make('name')
+    ->label(fn (string $state): string => "Name: {$state}")
+    ->color(fn (string $state): string => $state === 'Admin' ? 'danger' : 'primary');
+```
+
+### Inject Other Entry States
+**Getting values from other entries:**
+```php
+use Filament\Schemas\Components\Utilities\Get;
+
+TextEntry::make('full_name')
+    ->state(function (Get $get) {
+        $firstName = $get('first_name');
+        $lastName = $get('last_name');
+        return "{$firstName} {$lastName}";
+    });
+```
+
+### Inject Eloquent Record
+**Accessing the current Eloquent record:**
+```php
+use Illuminate\Database\Eloquent\Model;
+
+TextEntry::make('user_info')
+    ->state(function (?Model $record) {
+        return $record ? "User ID: {$record->id}" : 'No user';
+    });
+```
+
+### Inject Current Operation
+**Checking the current operation type:**
+```php
+TextEntry::make('editable_field')
+    ->hidden(fn (string $operation) => $operation === 'view');
+```
+
+### Inject Livewire Component Instance
+**Accessing Livewire component:**
+```php
+use Livewire\Component;
+
+TextEntry::make('component_data')
+    ->state(function (Component $livewire) {
+        return $livewire->someProperty;
+    });
+```
+
+### Inject Entry Instance
+**Accessing entry component instance:**
+```php
+use Filament\Infolists\Components\Entry;
+
+TextEntry::make('dynamic_label')
+    ->label(function (Entry $component) {
+        return $component->getName() . ' Label';
+    });
+```
+
+### Inject Multiple Utilities
+**Combining multiple utilities:**
+```php
+use App\Models\User;
+use Filament\Schemas\Components\Utilities\Get;
+use Livewire\Component as Livewire;
+
+TextEntry::make('complex_data')
+    ->state(function (Livewire $livewire, Get $get, User $record) {
+        $email = $get('email');
+        $componentData = $livewire->someProperty;
+        $userId = $record->id;
+        
+        return "Email: {$email}, Component: {$componentData}, User: {$userId}";
+    });
+```
+
+### Inject Laravel Container Dependencies
+**Injecting Laravel services:**
+```php
+use App\Models\User;
+use Illuminate\Http\Request;
+
+TextEntry::make('request_data')
+    ->state(function (Request $request, User $record) {
+        return "IP: {$request->ip()}, User: {$record->name}";
+    });
+```
+
+## Global Settings
+**Setting default behavior for all entries:**
+
+```php
+// In AppServiceProvider's boot() method
+use Filament\Infolists\Components\TextEntry;
+
+TextEntry::configureUsing(function (TextEntry $entry): void {
+    $entry->words(10);  // Limit all text entries to 10 words
+});
+
+// Can still override in individual entries
+TextEntry::make('full_description')
+    ->words(null);  // No word limit
+```
+
+## Basic Entry Components
+
+### Text Entry
+**Features:**
+- Text content display and formatting
+- Supports multiple text sizes and styles
+- Auto-wrapping and truncation
+- Supports HTML content
+- Copyable text content
+
+**Example Code:**
+```php
+use Filament\Infolists\Components\TextEntry;
+
+TextEntry::make('name')
+    ->label('Full Name')
+    ->size(TextEntry\TextEntrySize::Large)
+    ->weight('bold')
+    ->color('primary');
+
+TextEntry::make('description')
+    ->label('Description')
+    ->html()
+    ->markdown()
+    ->prose()
+    ->limit(200)
+    ->copyable();
+
+TextEntry::make('email')
+    ->label('Email Address')
+    ->url(fn ($state) => "mailto:{$state}")
+    ->icon('heroicon-m-envelope');
+```
+
+### Icon Entry
+**Features:**
+- Icon display and status indication
+- Supports multiple icon libraries
+- Custom icon colors and sizes
+- Conditional icon display
+
+**Example Code:**
+```php
+use Filament\Infolists\Components\IconEntry;
+
+IconEntry::make('status')
+    ->label('Status')
+    ->icon(fn (string $state): string => match ($state) {
+        'active' => 'heroicon-o-check-circle',
+        'inactive' => 'heroicon-o-x-circle',
+        'pending' => 'heroicon-o-clock',
+        default => 'heroicon-o-question-mark-circle',
+    })
+    ->color(fn (string $state): string => match ($state) {
+        'active' => 'success',
+        'inactive' => 'danger',
+        'pending' => 'warning',
+        default => 'gray',
+    })
+    ->size('lg');
+```
+
+### Image Entry
+**Features:**
+- Image display and preview
+- Supports multiple image formats
+- Custom image sizes and styles
+- Circular, square, and other shape options
+- Click to zoom functionality
+
+**Example Code:**
+```php
+use Filament\Infolists\Components\ImageEntry;
+
+ImageEntry::make('avatar')
+    ->label('Profile Picture')
+    ->circular()
+    ->size(80)
+    ->extraImgAttributes(['class' => 'object-cover']);
+
+ImageEntry::make('banner')
+    ->label('Banner Image')
+    ->square()
+    ->size(200)
+    ->openUrlInNewTab()
+    ->extraImgAttributes(['class' => 'rounded-lg shadow-md']);
+```
+
+### Color Entry
+**Features:**
+- Color display and preview
+- Supports multiple color formats
+- Copyable color values
+- Custom color display styles
+
+**Example Code:**
+```php
+use Filament\Infolists\Components\ColorEntry;
+
+ColorEntry::make('theme_color')
+    ->label('Theme Color')
+    ->copyable()
+    ->copyMessage('Color copied to clipboard!')
+    ->size('lg');
+```
+
+### Code Entry
+**Features:**
+- Code syntax highlighting display
+- Supports multiple programming languages
+- Line number display
+- Code copy functionality
+
+**Example Code:**
+```php
+use Filament\Infolists\Components\CodeEntry;
+
+CodeEntry::make('custom_css')
+    ->label('Custom CSS')
+    ->language('css')
+    ->copyable()
+    ->lineNumbers();
+```
+
+### Key Value Entry
+**Features:**
+- Key-value pair data display
+- Supports nested structures
+- Custom key and value formats
+- Conditional display
+
+**Example Code:**
+```php
+use Filament\Infolists\Components\KeyValueEntry;
+
+KeyValueEntry::make('metadata')
+    ->label('Custom Metadata')
+    ->keyLabel('Property')
+    ->valueLabel('Value')
+    ->columnSpanFull();
+```
+
+### Repeatable Entry
+**Features:**
+- Repeatable data structure display
+- Supports list and table formats
+- Custom item labels
+- Conditional display
+
+**Example Code:**
+```php
+use Filament\Infolists\Components\RepeatableEntry;
+
+RepeatableEntry::make('phone_numbers')
+    ->label('Phone Numbers')
+    ->schema([
+        TextEntry::make('type')
+            ->label('Type')
+            ->badge(),
+        TextEntry::make('number')
+            ->label('Number')
+            ->url(fn ($state) => "tel:{$state}"),
+    ])
+    ->contained(false);
+```
+
+## Advanced Features
+
+### Conditional Display
+**Dynamic display based on data conditions:**
+```php
+TextEntry::make('status')
+    ->label('Status')
+    ->visible(fn ($record) => $record->status !== 'draft')
+    ->color(fn ($state) => $state === 'published' ? 'success' : 'warning');
+```
+
+### Custom Formatting
+**Data formatting and transformation:**
+```php
+TextEntry::make('created_at')
+    ->label('Created At')
+    ->dateTime('M j, Y g:i A')
+    ->timezone('UTC');
+
+TextEntry::make('price')
+    ->label('Price')
+    ->money('USD')
+    ->color(fn ($state) => $state > 100 ? 'success' : 'gray');
+```
+
+### Relationship Data Display
+**Displaying related model data:**
+```php
+TextEntry::make('user.name')
+    ->label('Created By')
+    ->url(fn ($record) => route('admin.users.edit', $record->user));
+
+TextEntry::make('category.name')
+    ->label('Category')
+    ->badge()
+    ->color('primary');
+```
+
+### Custom Entries
+**Creating completely custom entries:**
+```php
+use Filament\Infolists\Components\Entry;
+
+class CustomEntry extends Entry
+{
+    protected string $view = 'infolists.components.custom-entry';
+
+    public function getState(): mixed
+    {
+        return $this->evaluate($this->state);
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->afterStateHydrated(function ($state) {
+            // Custom state handling logic
+        });
+    }
+}
+```
+
+## Layout and Organization
+
+### Using Schema Components
+**Layout components shared with forms:**
+```php
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Tabs;
+
+Section::make('Personal Information')
+    ->schema([
+        TextEntry::make('name'),
+        TextEntry::make('email'),
+        TextEntry::make('phone'),
+    ])
+    ->columns(3);
+
+Tabs::make('User Details')
+    ->tabs([
+        Tabs\Tab::make('Basic Info')
+            ->schema([
+                TextEntry::make('name'),
+                TextEntry::make('email'),
+            ]),
+        Tabs\Tab::make('Address')
+            ->schema([
+                TextEntry::make('street'),
+                TextEntry::make('city'),
+                TextEntry::make('postal_code'),
+            ]),
+    ]);
+```
+
+### Responsive Design
+**Supports responsive layouts:**
+```php
+Grid::make()
+    ->columns([
+        'default' => 1,
+        'md' => 2,
+        'xl' => 3,
+    ])
+    ->schema([
+        TextEntry::make('name')
+            ->columnSpan([
+                'default' => 1,
+                'md' => 2,
+            ]),
+        TextEntry::make('email')
+            ->columnSpan([
+                'default' => 1,
+                'md' => 1,
+            ]),
+    ]);
+```
+
+## Best Practices
+
+### Performance Optimization
+- Use appropriate data loading strategies
+- Avoid N+1 query problems
+- Use conditional display reasonably
+
+### User Experience
+- Provide clear labels and descriptions
+- Use appropriate colors and icons
+- Ensure responsive design
+
+### Accessibility
+- Provide appropriate ARIA labels
+- Ensure keyboard navigation support
+- Use sufficient color contrast
+
+---
+
+**Previous:** [Part 3: Form System](FILAMENT-03-FORMS.md)  
+**Next:** [Part 5: Schema System](FILAMENT-05-SCHEMAS.md)
