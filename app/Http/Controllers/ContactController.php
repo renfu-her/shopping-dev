@@ -47,7 +47,7 @@ class ContactController extends Controller
             ]);
 
             // Send email notification
-            Mail::to(config('mail.admin_email', 'admin@example.com'))
+            Mail::to(config('mail.admin_email', 'renfu.her@gmail.com'))
                 ->send(new ContactFormMail($contact));
 
             return redirect()->back()->with('success', 'Thank you for your message! We\'ll get back to you within 24 hours.');
