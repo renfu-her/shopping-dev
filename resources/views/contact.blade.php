@@ -61,52 +61,90 @@
                         <div class="text-center mb-4">
                             <h2>Send us a Message</h2>
                             <p class="text-muted">Fill out the form below and we'll get back to you within 24 hours.</p>
+                            
+                            @if($errors->any())
+                                <div class="alert alert-danger">
+                                    <h5><i class="fas fa-exclamation-triangle me-2"></i>Please correct the following errors:</h5>
+                                    <ul class="mb-0">
+                                        @foreach($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
                         </div>
                         
-                        <form id="contactForm">
+                        <form id="contactForm" method="POST" action="{{ route('contact.store') }}">
+                            @csrf
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label for="firstName" class="form-label">First Name *</label>
-                                    <input type="text" class="form-control" id="firstName" required>
+                                    <input type="text" class="form-control @error('first_name') is-invalid @enderror" 
+                                           id="firstName" name="first_name" value="{{ old('first_name') }}" required>
+                                    @error('first_name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-md-6">
                                     <label for="lastName" class="form-label">Last Name *</label>
-                                    <input type="text" class="form-control" id="lastName" required>
+                                    <input type="text" class="form-control @error('last_name') is-invalid @enderror" 
+                                           id="lastName" name="last_name" value="{{ old('last_name') }}" required>
+                                    @error('last_name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-md-6">
                                     <label for="email" class="form-label">Email Address *</label>
-                                    <input type="email" class="form-control" id="email" required>
+                                    <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                                           id="email" name="email" value="{{ old('email') }}" required>
+                                    @error('email')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-md-6">
                                     <label for="phone" class="form-label">Phone Number</label>
-                                    <input type="tel" class="form-control" id="phone">
+                                    <input type="tel" class="form-control @error('phone') is-invalid @enderror" 
+                                           id="phone" name="phone" value="{{ old('phone') }}">
+                                    @error('phone')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-12">
                                     <label for="subject" class="form-label">Subject *</label>
-                                    <select class="form-select" id="subject" required>
+                                    <select class="form-select @error('subject') is-invalid @enderror" 
+                                            id="subject" name="subject" required>
                                         <option value="">Select a subject</option>
-                                        <option value="general">General Inquiry</option>
-                                        <option value="support">Customer Support</option>
-                                        <option value="sales">Sales Question</option>
-                                        <option value="partnership">Partnership</option>
-                                        <option value="feedback">Feedback</option>
-                                        <option value="other">Other</option>
+                                        <option value="general" {{ old('subject') == 'general' ? 'selected' : '' }}>General Inquiry</option>
+                                        <option value="support" {{ old('subject') == 'support' ? 'selected' : '' }}>Customer Support</option>
+                                        <option value="sales" {{ old('subject') == 'sales' ? 'selected' : '' }}>Sales Question</option>
+                                        <option value="partnership" {{ old('subject') == 'partnership' ? 'selected' : '' }}>Partnership</option>
+                                        <option value="feedback" {{ old('subject') == 'feedback' ? 'selected' : '' }}>Feedback</option>
+                                        <option value="other" {{ old('subject') == 'other' ? 'selected' : '' }}>Other</option>
                                     </select>
+                                    @error('subject')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-12">
                                     <label for="message" class="form-label">Message *</label>
-                                    <textarea class="form-control" id="message" rows="5" placeholder="Tell us how we can help you..." required></textarea>
+                                    <textarea class="form-control @error('message') is-invalid @enderror" 
+                                              id="message" name="message" rows="5" 
+                                              placeholder="Tell us how we can help you..." required>{{ old('message') }}</textarea>
+                                    @error('message')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-12">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="newsletter">
+                                        <input class="form-check-input" type="checkbox" id="newsletter" 
+                                               name="newsletter" value="1" {{ old('newsletter') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="newsletter">
                                             Subscribe to our newsletter for updates and special offers
                                         </label>
                                     </div>
                                 </div>
                                 <div class="col-12 text-center">
-                                    <button type="submit" class="btn btn-submit btn-lg">
+                                    <button type="submit" class="btn btn-submit btn-lg" id="submitBtn">
                                         <i class="fas fa-paper-plane me-2"></i>Send Message
                                     </button>
                                 </div>
@@ -224,24 +262,46 @@
 <script>
     // Contact form handling
     document.getElementById('contactForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+        const submitBtn = document.getElementById('submitBtn');
+        const originalText = submitBtn.innerHTML;
         
-        // Get form data
-        const formData = {
-            firstName: document.getElementById('firstName').value,
-            lastName: document.getElementById('lastName').value,
-            email: document.getElementById('email').value,
-            phone: document.getElementById('phone').value,
-            subject: document.getElementById('subject').value,
-            message: document.getElementById('message').value,
-            newsletter: document.getElementById('newsletter').checked
-        };
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
         
-        // Show success message (in a real app, you would send this to your server)
-        alert('Thank you for your message! We\'ll get back to you within 24 hours.');
-        
-        // Reset form
-        this.reset();
+        // Let the form submit naturally to the server
+        // The server will handle validation and response
     });
+
+    // Show success message if redirected back with success
+    @if(session('success'))
+        showToast('{{ session('success') }}', 'success');
+    @endif
+
+    // Show error message if redirected back with error
+    @if(session('error'))
+        showToast('{{ session('error') }}', 'error');
+    @endif
+
+    // Toast notification function
+    function showToast(message, type = 'info') {
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show position-fixed`;
+        toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        toast.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 5000);
+    }
 </script>
 @endpush
