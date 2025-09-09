@@ -24,13 +24,13 @@
                 <div class="swiper hero-swiper">
                     <div class="swiper-wrapper">
                         <div class="swiper-slide">
-                            <img src="/example/assets/images/slider-image/sample-1.jpg" alt="Hero Image 1" class="img-fluid rounded">
+                            <img src="{{ asset('assets/images/slider-image/sample-1.jpg') }}" alt="Hero Image 1" class="img-fluid rounded">
                         </div>
                         <div class="swiper-slide">
-                            <img src="/example/assets/images/slider-image/sample-2.jpg" alt="Hero Image 2" class="img-fluid rounded">
+                            <img src="{{ asset('assets/images/slider-image/sample-2.jpg') }}" alt="Hero Image 2" class="img-fluid rounded">
                         </div>
                         <div class="swiper-slide">
-                            <img src="/example/assets/images/slider-image/sample-3.jpg" alt="Hero Image 3" class="img-fluid rounded">
+                            <img src="{{ asset('assets/images/slider-image/sample-3.jpg') }}" alt="Hero Image 3" class="img-fluid rounded">
                         </div>
                     </div>
                     <div class="swiper-pagination"></div>
@@ -208,7 +208,7 @@
             col.innerHTML = `
                 <div class="card product-card h-100 position-relative">
                     ${discount > 0 ? `<div class="badge-sale">-${discount}%</div>` : ''}
-                    <img src="${product.image || '/example/assets/images/product-image/1.jpg'}" 
+                    <img src="${product.image || '{{ asset('assets/images/product-image/1.jpg') }}'}" 
                          class="card-img-top product-image" 
                          alt="${product.name}">
                     <div class="card-body d-flex flex-column">
