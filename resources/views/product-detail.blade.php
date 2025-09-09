@@ -193,7 +193,7 @@
                         thumbnailGallery.appendChild(thumbnail);
                     });
                 } else {
-                    mainImage.src = '/example/assets/images/product-image/1.jpg';
+                    mainImage.src = '/assets/images/product-image/1.jpg';
                     mainImage.alt = this.product.name;
                 }
 
@@ -304,7 +304,7 @@
                 
                 col.innerHTML = `
                     <div class="card related-product-card h-100">
-                        <img src="${product.images && product.images[0] ? product.images[0] : '/example/assets/images/product-image/1.jpg'}" 
+                        <img src="${product.images && product.images[0] ? product.images[0] : '/assets/images/product-image/1.jpg'}" 
                              class="card-img-top related-product-image" 
                              alt="${product.name}">
                         <div class="card-body d-flex flex-column">
