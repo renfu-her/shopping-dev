@@ -19,7 +19,7 @@
                 <!-- Product Images -->
                 <div class="col-lg-6">
                     <div class="product-images">
-                        <img id="main-product-image" src="" alt="Product Image" class="product-image mb-3">
+                        <img id="main-product-image" src="/assets/images/product-image/1.jpg" alt="Product Image" class="product-image mb-3" onerror="this.src='/assets/images/product-image/1.jpg'">
                         <div class="thumbnail-gallery d-flex gap-2">
                             <!-- Thumbnails will be loaded here -->
                         </div>
@@ -182,11 +182,13 @@
                 if (this.product.images && this.product.images.length > 0) {
                     mainImage.src = this.product.images[0];
                     mainImage.alt = this.product.name;
+                    mainImage.onerror = function() { this.src = '/assets/images/product-image/1.jpg'; };
                     
                     thumbnailGallery.innerHTML = '';
                     this.product.images.forEach((image, index) => {
                         const thumbnail = document.createElement('img');
                         thumbnail.src = image;
+                        thumbnail.onerror = function() { this.src = '/assets/images/product-image/1.jpg'; };
                         thumbnail.alt = this.product.name;
                         thumbnail.className = `product-thumbnail ${index === 0 ? 'active' : ''}`;
                         thumbnail.onclick = () => this.changeMainImage(image, thumbnail);
@@ -195,6 +197,7 @@
                 } else {
                     mainImage.src = '/assets/images/product-image/1.jpg';
                     mainImage.alt = this.product.name;
+                    mainImage.onerror = function() { this.src = '/assets/images/product-image/1.jpg'; };
                 }
 
                 // Product information
@@ -306,7 +309,8 @@
                     <div class="card related-product-card h-100">
                         <img src="${product.images && product.images[0] ? product.images[0] : '/assets/images/product-image/1.jpg'}" 
                              class="card-img-top related-product-image" 
-                             alt="${product.name}">
+                             alt="${product.name}"
+                             onerror="this.src='/assets/images/product-image/1.jpg'">
                         <div class="card-body d-flex flex-column">
                             <h6 class="card-title">${product.name}</h6>
                             <p class="card-text text-muted small flex-grow-1">${product.description || ''}</p>

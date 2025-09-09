@@ -208,9 +208,10 @@
             col.innerHTML = `
                 <div class="card product-card h-100 position-relative">
                     ${discount > 0 ? `<div class="badge-sale">-${discount}%</div>` : ''}
-                    <img src="${product.image || '{{ asset('assets/images/product-image/1.jpg') }}'}" 
+                    <img src="${product.image || '/assets/images/product-image/1.jpg'}" 
                          class="card-img-top product-image" 
-                         alt="${product.name}">
+                         alt="${product.name}"
+                         onerror="this.src='/assets/images/product-image/1.jpg'">
                     <div class="card-body d-flex flex-column">
                         <h6 class="card-title">${product.name}</h6>
                         <p class="card-text text-muted small flex-grow-1">${product.description || ''}</p>

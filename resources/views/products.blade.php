@@ -117,10 +117,11 @@ function createProductCard(product) {
     col.innerHTML = `
         <div class="card h-100 product-card">
             <div class="position-relative">
-                <img src="${product.image || '/assets/images/placeholder-product.jpg'}" 
+                <img src="${product.image || '/assets/images/product-image/1.jpg'}" 
                      class="card-img-top" 
                      alt="${product.name}"
-                     style="height: 250px; object-fit: cover;">
+                     style="height: 250px; object-fit: cover;"
+                     onerror="this.src='/assets/images/product-image/1.jpg'">
                 ${discountPercentage ? `
                     <span class="badge bg-danger position-absolute top-0 end-0 m-2">
                         -${discountPercentage}%
