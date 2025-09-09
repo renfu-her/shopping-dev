@@ -110,6 +110,15 @@ class ProductController extends Controller
     }
 
     /**
+     * Get related products by product ID
+     */
+    public function relatedById($id, Request $request): AnonymousResourceCollection
+    {
+        $product = Product::with(['categories'])->findOrFail($id);
+        return $this->related($product, $request);
+    }
+
+    /**
      * Get related products
      */
     public function related(Product $product, Request $request): AnonymousResourceCollection
