@@ -1,0 +1,644 @@
+/* ========================================
+   Shopping Store Custom Styles
+   ======================================== */
+
+/* ========================================
+   Common/Shared Styles
+   ======================================== */
+
+/* Hero Section - Used across multiple pages */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 80px 0;
+}
+
+/* Feature Icons - Used across multiple pages */
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+/* About page specific feature icons */
+.feature-icon.about {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+}
+
+/* Contact page specific feature icons */
+.feature-icon.contact {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Swiper slides */
+.swiper-slide {
+    height: auto;
+}
+
+/* ========================================
+   Home Page Styles
+   ======================================== */
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.category-card {
+    background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.category-card:hover {
+    transform: scale(1.05);
+}
+
+.badge-sale {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: #6c757d;
+    font-size: 1rem;
+}
+
+/* ========================================
+   About Page Styles
+   ======================================== */
+
+.team-member {
+    text-align: center;
+    padding: 30px;
+    border-radius: 15px;
+    background: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.team-member:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+.team-member img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+
+.stats-section {
+    background: #f8f9fa;
+    padding: 60px 0;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 20px;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #667eea;
+}
+
+/* ========================================
+   Cart Page Styles
+   ======================================== */
+
+.cart-item {
+    transition: all 0.3s ease;
+}
+
+.cart-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.quantity-input {
+    width: 80px;
+    text-align: center;
+}
+
+.product-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.cart-summary {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.coupon-section {
+    background: #fff;
+    border: 2px dashed #dee2e6;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-cart i {
+    font-size: 4rem;
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+.related-product {
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.related-product:hover {
+    border-color: #007bff;
+    transform: translateY(-5px);
+}
+
+.related-product img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* ========================================
+   Checkout Page Styles
+   ======================================== */
+
+.checkout-step {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+.step-number.active {
+    background: #007bff;
+    color: white;
+}
+
+.step-number.completed {
+    background: #28a745;
+    color: white;
+}
+
+.form-section {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.order-summary {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    position: sticky;
+    top: 100px;
+}
+
+.payment-method {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.payment-method:hover {
+    border-color: #007bff;
+}
+
+.payment-method.selected {
+    border-color: #007bff;
+    background: #f8f9ff;
+}
+
+.btn-checkout {
+    background: linear-gradient(45deg, #28a745, #20c997);
+    border: none;
+    color: white;
+    font-weight: bold;
+    padding: 15px 30px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+.btn-checkout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+    color: white;
+}
+
+/* ========================================
+   Contact Page Styles
+   ======================================== */
+
+.contact-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.contact-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.contact-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: white;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.btn-submit {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border: none;
+    color: white;
+    font-weight: bold;
+    padding: 12px 30px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    color: white;
+}
+
+.map-container {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* ========================================
+   Product Detail Page Styles
+   ======================================== */
+
+.product-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.product-thumbnail {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.product-thumbnail:hover,
+.product-thumbnail.active {
+    border-color: #007bff;
+}
+
+.price {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: #6c757d;
+    font-size: 1.2rem;
+}
+
+.badge-sale {
+    background: #dc3545;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.btn-buy-now {
+    background: linear-gradient(45deg, #28a745, #20c997);
+    border: none;
+    color: white;
+    font-weight: bold;
+    padding: 12px 30px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+.btn-buy-now:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+    color: white;
+}
+
+.btn-add-cart {
+    background: linear-gradient(45deg, #007bff, #6610f2);
+    border: none;
+    color: white;
+    font-weight: bold;
+    padding: 12px 30px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+.btn-add-cart:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+    color: white;
+}
+
+.product-info {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.related-product-card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.related-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.related-product-image {
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px 8px 0 0;
+}
+
+/* ========================================
+   Authentication Forms
+   ======================================== */
+
+.auth-form {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.auth-form .card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.auth-form .input-group-text {
+    background: #f8f9fa;
+    border-color: #dee2e6;
+    color: #6c757d;
+}
+
+.auth-form .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.auth-form .btn-primary {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.auth-form .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.auth-form .alert {
+    border-radius: 8px;
+    border: none;
+}
+
+.auth-form .text-primary {
+    color: #667eea !important;
+}
+
+.auth-form .text-primary:hover {
+    color: #764ba2 !important;
+}
+
+/* User dropdown menu */
+.navbar-nav .dropdown-menu {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 10px 0;
+}
+
+.navbar-nav .dropdown-item {
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .dropdown-item:hover {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+}
+
+.navbar-nav .dropdown-item i {
+    width: 20px;
+}
+
+/* Combined Authentication Page */
+.auth-combined .card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.auth-combined .btn-outline-primary,
+.auth-combined .btn-outline-success {
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.auth-combined .btn-outline-primary:hover {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border-color: transparent;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.auth-combined .btn-outline-success:hover {
+    background: linear-gradient(45deg, #28a745, #20c997);
+    border-color: transparent;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+.auth-combined .btn-danger {
+    background: linear-gradient(45deg, #dc3545, #e74c3c);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.auth-combined .btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+}
+
+.auth-combined .fa-user-circle {
+    color: #667eea;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+    }
+    
+    .product-image {
+        height: 300px;
+    }
+    
+    .team-member img {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .contact-card {
+        padding: 20px;
+    }
+    
+    .form-section {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-section {
+        padding: 60px 0;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .category-card {
+        padding: 20px;
+    }
+    
+    .team-member {
+        padding: 20px;
+    }
+    
+    .cart-summary {
+        padding: 15px;
+    }
+    
+    .coupon-section {
+        padding: 15px;
+    }
+}

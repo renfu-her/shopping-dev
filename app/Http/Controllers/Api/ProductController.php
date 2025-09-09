@@ -16,7 +16,7 @@ class ProductController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $query = Product::with(['categories', 'images'])
+        $query = Product::with(['categories'])
             ->where('is_active', true);
 
         // Search by name or description
@@ -84,7 +84,7 @@ class ProductController extends Controller
             ], 404);
         }
 
-        $product->load(['categories', 'images']);
+        $product->load(['categories']);
 
         return response()->json([
             'success' => true,
@@ -99,7 +99,7 @@ class ProductController extends Controller
     {
         $limit = min($request->get('limit', 10), 20); // Max 20 featured products
 
-        $products = Product::with(['categories', 'images'])
+        $products = Product::with(['categories'])
             ->where('is_active', true)
             ->where('is_featured', true)
             ->orderBy('created_at', 'desc')
@@ -116,7 +116,7 @@ class ProductController extends Controller
     {
         $limit = min($request->get('limit', 5), 10); // Max 10 related products
 
-        $relatedProducts = Product::with(['categories', 'images'])
+        $relatedProducts = Product::with(['categories'])
             ->where('is_active', true)
             ->where('id', '!=', $product->id)
             ->whereHas('categories', function ($q) use ($product) {
@@ -138,7 +138,7 @@ class ProductController extends Controller
             'q' => 'required|string|min:2|max:255',
         ]);
 
-        $query = Product::with(['categories', 'images'])
+        $query = Product::with(['categories'])
             ->where('is_active', true);
 
         $searchTerm = $request->q;

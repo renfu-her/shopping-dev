@@ -21,11 +21,25 @@ class CartController extends Controller
     public function index(Request $request): JsonResponse
     {
         $cart = $this->getOrCreateCart($request);
-        $cart->load(['items.product.categories', 'items.product.images']);
+        $cart->load(['items.product.categories']);
 
         return response()->json([
             'success' => true,
             'data' => new CartResource($cart),
+        ]);
+    }
+
+    /**
+     * Get cart item count
+     */
+    public function count(Request $request): JsonResponse
+    {
+        $cart = $this->getOrCreateCart($request);
+        $count = $cart->items()->sum('quantity');
+
+        return response()->json([
+            'success' => true,
+            'count' => $count,
         ]);
     }
 
@@ -83,7 +97,7 @@ class CartController extends Controller
             }
         });
 
-        $cart->load(['items.product.categories', 'items.product.images']);
+        $cart->load(['items.product.categories']);
 
         return response()->json([
             'success' => true,
@@ -130,7 +144,7 @@ class CartController extends Controller
             ]);
         }
 
-        $cart->load(['items.product.categories', 'items.product.images']);
+        $cart->load(['items.product.categories']);
 
         return response()->json([
             'success' => true,
@@ -155,7 +169,7 @@ class CartController extends Controller
         }
 
         $cartItem->delete();
-        $cart->load(['items.product.categories', 'items.product.images']);
+        $cart->load(['items.product.categories']);
 
         return response()->json([
             'success' => true,
@@ -219,7 +233,7 @@ class CartController extends Controller
             ],
         ]);
 
-        $cart->load(['items.product.categories', 'items.product.images']);
+        $cart->load(['items.product.categories']);
 
         return response()->json([
             'success' => true,
@@ -239,7 +253,7 @@ class CartController extends Controller
             'coupon_data' => null,
         ]);
 
-        $cart->load(['items.product.categories', 'items.product.images']);
+        $cart->load(['items.product.categories']);
 
         return response()->json([
             'success' => true,

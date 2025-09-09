@@ -20,6 +20,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Legacy API routes (without v1 prefix for backward compatibility)
+Route::middleware('web')->group(function () {
+    Route::get('/cart/count', [CartController::class, 'count']);
+});
+
 // Public routes
 Route::prefix('v1')->group(function () {
     // Authentication routes
@@ -42,14 +47,17 @@ Route::prefix('v1')->group(function () {
     Route::get('/products/{product}', [ProductController::class, 'show']);
     Route::get('/products/{product}/related', [ProductController::class, 'related']);
 
-    // Cart routes (public for guests)
-    Route::get('/cart', [CartController::class, 'index']);
-    Route::post('/cart/add', [CartController::class, 'add']);
-    Route::put('/cart/items/{cartItem}', [CartController::class, 'update']);
-    Route::delete('/cart/items/{cartItem}', [CartController::class, 'remove']);
-    Route::delete('/cart/clear', [CartController::class, 'clear']);
-    Route::post('/cart/coupon/apply', [CartController::class, 'applyCoupon']);
-    Route::delete('/cart/coupon/remove', [CartController::class, 'removeCoupon']);
+    // Cart routes (public for guests) - with session support
+    Route::middleware('web')->group(function () {
+        Route::get('/cart', [CartController::class, 'index']);
+        Route::get('/cart/count', [CartController::class, 'count']);
+        Route::post('/cart/add', [CartController::class, 'add']);
+        Route::put('/cart/items/{cartItem}', [CartController::class, 'update']);
+        Route::delete('/cart/items/{cartItem}', [CartController::class, 'remove']);
+        Route::delete('/cart/clear', [CartController::class, 'clear']);
+        Route::post('/cart/coupon/apply', [CartController::class, 'applyCoupon']);
+        Route::delete('/cart/coupon/remove', [CartController::class, 'removeCoupon']);
+    });
 });
 
 // Protected routes (require authentication)

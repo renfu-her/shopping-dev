@@ -20,7 +20,7 @@ class OrderController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $orders = $request->user()->orders()
-            ->with(['items.product', 'items.product.images'])
+            ->with(['items.product'])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
@@ -40,7 +40,7 @@ class OrderController extends Controller
             ], 404);
         }
 
-        $order->load(['items.product', 'items.product.images']);
+        $order->load(['items.product']);
 
         return response()->json([
             'success' => true,
@@ -123,7 +123,7 @@ class OrderController extends Controller
             // TODO: Implement email sending
         });
 
-        $order = Order::with(['items.product', 'items.product.images'])
+        $order = Order::with(['items.product'])
             ->where('user_id', $user->id)
             ->latest()
             ->first();
