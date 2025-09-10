@@ -50,7 +50,7 @@ final class BannerForm
                             mkdir(storage_path('app/public/banners'), 0755, true);
                         }
                         $image->toWebp(80)->save(storage_path('app/public/courses/' . $filename));
-                        return 'courses/' . $filename;
+                        return 'banners/' . $filename;
                     })
                     ->deleteUploadedFileUsing(function ($file) {
                         if ($file) {
