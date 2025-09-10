@@ -33,6 +33,7 @@ final class BannerForm
                     ->image()
                     ->disk('public')
                     ->directory('banners')
+                    ->visibility('public')
                     ->imageEditor()
                     ->imageCropAspectRatio('16:9')
                     ->imageResizeTargetWidth('1200')
