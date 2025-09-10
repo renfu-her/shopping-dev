@@ -31,6 +31,8 @@ final class BannerForm
                 FileUpload::make('image')
                     ->label('Banner Image')
                     ->image()
+                    ->disk('public')
+                    ->directory('banners')
                     ->imageEditor()
                     ->imageCropAspectRatio('16:9')
                     ->imageResizeTargetWidth('1200')
