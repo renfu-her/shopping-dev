@@ -28,7 +28,7 @@
                     <p>Our commitment to quality, customer satisfaction, and innovation has made us a leader in the online retail space. We continuously strive to improve our services and expand our product range to meet the evolving needs of our customers.</p>
                 </div>
                 <div class="col-lg-6">
-                    <img src="/example/assets/images/about/our-story.jpg" alt="Our Story" class="img-fluid rounded shadow">
+                    <img src="/example/assets/images/slider-image/sample-1.jpg" alt="Our Story" class="img-fluid rounded shadow">
                 </div>
             </div>
         </div>
@@ -146,7 +146,7 @@
             <div class="row g-4">
                 <div class="col-lg-4 col-md-6">
                     <div class="team-member">
-                        <img src="/example/assets/images/team/ceo.jpg" alt="CEO">
+                        <img src="/example/assets/images/slider-image/sample-2.jpg" alt="CEO" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
                         <h4>John Smith</h4>
                         <p class="text-primary">CEO & Founder</p>
                         <p>Visionary leader with 15+ years of experience in e-commerce and retail.</p>
@@ -159,7 +159,7 @@
                 </div>
                 <div class="col-lg-4 col-md-6">
                     <div class="team-member">
-                        <img src="/example/assets/images/team/cto.jpg" alt="CTO">
+                        <img src="/example/assets/images/slider-image/sample-3.jpg" alt="CTO" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
                         <h4>Sarah Johnson</h4>
                         <p class="text-primary">CTO</p>
                         <p>Technology expert passionate about creating seamless digital experiences.</p>
@@ -172,7 +172,7 @@
                 </div>
                 <div class="col-lg-4 col-md-6">
                     <div class="team-member">
-                        <img src="/example/assets/images/team/cmo.jpg" alt="CMO">
+                        <img src="/example/assets/images/slider-image/sample-4.jpg" alt="CMO" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
                         <h4>Mike Davis</h4>
                         <p class="text-primary">CMO</p>
                         <p>Marketing strategist focused on building brand awareness and customer engagement.</p>
@@ -192,7 +192,7 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <img src="/example/assets/images/about/mission.jpg" alt="Our Mission" class="img-fluid rounded shadow">
+                    <img src="/example/assets/images/slider-image/sample-5.jpg" alt="Our Mission" class="img-fluid rounded shadow">
                 </div>
                 <div class="col-lg-6">
                     <h2 class="mb-4">Our Mission</h2>
