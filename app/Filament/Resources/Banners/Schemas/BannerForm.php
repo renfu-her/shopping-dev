@@ -9,6 +9,9 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Support\Str;
 
 final class BannerForm
 {
@@ -36,7 +39,37 @@ final class BannerForm
                     ->imageEditorEmptyFillColor('#ffffff')
                     ->acceptedFileTypes(['image/jpeg', 'image/png'])
                     ->required()
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->getUploadedFileUsing(function ($file) {
+                        // Process image with Intervention Image
+                        $imageManager = new ImageManager(new Driver());
+                        $image = $imageManager->read($file->getPathname());
+                        
+                        // Scale image to target dimensions while maintaining aspect ratio
+                        $image->scale(1200, 675);
+                        
+                        // Generate unique filename with original extension
+                        $extension = $file->getClientOriginalExtension();
+                        $filename = Str::uuid() . '.' . $extension;
+                        $processedPath = storage_path('app/public/banners/' . $filename);
+                        
+                        // Ensure directory exists
+                        if (!file_exists(dirname($processedPath))) {
+                            mkdir(dirname($processedPath), 0755, true);
+                        }
+                        
+                        // Save processed image
+                        $image->save($processedPath);
+                        
+                        // Return the processed file
+                        return new \Illuminate\Http\UploadedFile(
+                            $processedPath,
+                            $filename,
+                            $file->getMimeType(),
+                            null,
+                            true
+                        );
+                    }),
 
                 TextInput::make('link')
                     ->url()
