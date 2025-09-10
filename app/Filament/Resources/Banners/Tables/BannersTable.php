@@ -19,6 +19,7 @@ final class BannersTable
             ->columns(components: [
                 Tables\Columns\ImageColumn::make('image')
                     ->imageSize(60)
+                    ->square()
                     ->visibility('public'),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
