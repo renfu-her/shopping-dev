@@ -21,14 +21,11 @@
     <section class="py-5">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-lg-6">
+                <div class="col-lg-12">
                     <h2 class="mb-4">Our Story</h2>
                     <p class="lead">Founded in 2020, {{ config('app.name') }} started as a small online store with a big dream: to make quality products accessible to everyone.</p>
                     <p>What began as a passion project has grown into a trusted e-commerce platform serving thousands of customers worldwide. We believe that shopping should be convenient, enjoyable, and rewarding.</p>
                     <p>Our commitment to quality, customer satisfaction, and innovation has made us a leader in the online retail space. We continuously strive to improve our services and expand our product range to meet the evolving needs of our customers.</p>
-                </div>
-                <div class="col-lg-6">
-                    <img src="/example/assets/images/slider-image/sample-1.jpg" alt="Our Story" class="img-fluid rounded shadow">
                 </div>
             </div>
         </div>
@@ -136,63 +133,13 @@
         </div>
     </section>
 
-    <!-- Team Section -->
-    <section class="py-5 bg-light">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2>Meet Our Team</h2>
-                <p class="lead">The passionate people behind {{ config('app.name') }}</p>
-            </div>
-            <div class="row g-4">
-                <div class="col-lg-4 col-md-6">
-                    <div class="team-member">
-                        <img src="/example/assets/images/slider-image/sample-2.jpg" alt="CEO" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-                        <h4>John Smith</h4>
-                        <p class="text-primary">CEO & Founder</p>
-                        <p>Visionary leader with 15+ years of experience in e-commerce and retail.</p>
-                        <div class="social-links">
-                            <a href="#" class="text-primary me-2"><i class="fab fa-linkedin"></i></a>
-                            <a href="#" class="text-primary me-2"><i class="fab fa-twitter"></i></a>
-                            <a href="#" class="text-primary"><i class="fab fa-facebook"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="team-member">
-                        <img src="/example/assets/images/slider-image/sample-3.jpg" alt="CTO" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-                        <h4>Sarah Johnson</h4>
-                        <p class="text-primary">CTO</p>
-                        <p>Technology expert passionate about creating seamless digital experiences.</p>
-                        <div class="social-links">
-                            <a href="#" class="text-primary me-2"><i class="fab fa-linkedin"></i></a>
-                            <a href="#" class="text-primary me-2"><i class="fab fa-github"></i></a>
-                            <a href="#" class="text-primary"><i class="fab fa-twitter"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="team-member">
-                        <img src="/example/assets/images/slider-image/sample-4.jpg" alt="CMO" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-                        <h4>Mike Davis</h4>
-                        <p class="text-primary">CMO</p>
-                        <p>Marketing strategist focused on building brand awareness and customer engagement.</p>
-                        <div class="social-links">
-                            <a href="#" class="text-primary me-2"><i class="fab fa-linkedin"></i></a>
-                            <a href="#" class="text-primary me-2"><i class="fab fa-instagram"></i></a>
-                            <a href="#" class="text-primary"><i class="fab fa-facebook"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Mission Section -->
     <section class="py-5">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <img src="/example/assets/images/slider-image/sample-5.jpg" alt="Our Mission" class="img-fluid rounded shadow">
+                    <!-- Image removed -->
                 </div>
                 <div class="col-lg-6">
                     <h2 class="mb-4">Our Mission</h2>
