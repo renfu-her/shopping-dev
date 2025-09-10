@@ -46,8 +46,8 @@ final class BannerForm
                         $image->scale(1200, 675);
                         $filename = Str::uuid7()->toString() . '.webp';
 
-                        if (!file_exists(storage_path('app/public/courses'))) {
-                            mkdir(storage_path('app/public/courses'), 0755, true);
+                        if (!file_exists(storage_path('app/public/banners'))) {
+                            mkdir(storage_path('app/public/banners'), 0755, true);
                         }
                         $image->toWebp(80)->save(storage_path('app/public/courses/' . $filename));
                         return 'courses/' . $filename;
