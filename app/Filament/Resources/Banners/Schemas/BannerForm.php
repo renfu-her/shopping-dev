@@ -11,6 +11,8 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 final class BannerForm
 {
@@ -27,32 +29,33 @@ final class BannerForm
                     ->columnSpanFull(),
 
                 FileUpload::make('image')
+                    ->label('主要圖片')
                     ->image()
-                    ->directory('banners')
-                    ->required()
-                    ->columnSpanFull()
                     ->imageEditor()
-                    ->imageCropAspectRatio('16:9')
-                    ->getUploadedFileUsing(function ($file) {
-                        // Process image with Intervention Image
-                        $imageManager = new ImageManager(new Driver());
-                        $image = $imageManager->read($file->getPathname());
-                        
-                        // Scale image to target dimensions while maintaining aspect ratio
+                    ->directory('course-main-images')
+                    ->columnSpanFull()
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                    ->downloadable()
+                    ->openable()
+                    ->getUploadedFileNameForStorageUsing(
+                        fn($file): string => (string) str(Str::uuid7() . '.webp')
+                    )
+                    ->saveUploadedFileUsing(function ($file) {
+                        $manager = new ImageManager(new Driver());
+                        $image = $manager->read($file);
                         $image->scale(1200, 675);
-                        
-                        // Convert to WebP format
-                        $webpPath = str_replace(['.jpg', '.jpeg', '.png'], '.webp', $file->getPathname());
-                        $image->toWebp(90)->save($webpPath);
-                        
-                        // Return the WebP file
-                        return new \Illuminate\Http\UploadedFile(
-                            $webpPath,
-                            str_replace(['.jpg', '.jpeg', '.png'], '.webp', $file->getClientOriginalName()),
-                            'image/webp',
-                            null,
-                            true
-                        );
+                        $filename = Str::uuid7()->toString() . '.webp';
+
+                        if (!file_exists(storage_path('app/public/courses'))) {
+                            mkdir(storage_path('app/public/courses'), 0755, true);
+                        }
+                        $image->toWebp(80)->save(storage_path('app/public/courses/' . $filename));
+                        return 'courses/' . $filename;
+                    })
+                    ->deleteUploadedFileUsing(function ($file) {
+                        if ($file) {
+                            Storage::disk('public')->delete($file);
+                        }
                     }),
 
                 TextInput::make('link')
