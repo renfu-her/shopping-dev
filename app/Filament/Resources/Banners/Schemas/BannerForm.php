@@ -9,6 +9,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 final class BannerForm
 {
@@ -28,7 +30,30 @@ final class BannerForm
                     ->image()
                     ->directory('banners')
                     ->required()
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->imageEditor()
+                    ->imageCropAspectRatio('16:9')
+                    ->getUploadedFileUsing(function ($file) {
+                        // Process image with Intervention Image
+                        $imageManager = new ImageManager(new Driver());
+                        $image = $imageManager->read($file->getPathname());
+                        
+                        // Scale image to target dimensions while maintaining aspect ratio
+                        $image->scale(1200, 675);
+                        
+                        // Convert to WebP format
+                        $webpPath = str_replace(['.jpg', '.jpeg', '.png'], '.webp', $file->getPathname());
+                        $image->toWebp(90)->save($webpPath);
+                        
+                        // Return the WebP file
+                        return new \Illuminate\Http\UploadedFile(
+                            $webpPath,
+                            str_replace(['.jpg', '.jpeg', '.png'], '.webp', $file->getClientOriginalName()),
+                            'image/webp',
+                            null,
+                            true
+                        );
+                    }),
 
                 TextInput::make('link')
                     ->url()
