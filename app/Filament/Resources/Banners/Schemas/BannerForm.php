@@ -32,7 +32,6 @@ final class BannerForm
                     ->label('主要圖片')
                     ->image()
                     ->imageEditor()
-                    ->directory('banner-main-images')
                     ->columnSpanFull()
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                     ->downloadable()
