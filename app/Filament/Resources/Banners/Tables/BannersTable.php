@@ -16,9 +16,10 @@ final class BannersTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->columns([
+            ->columns(components: [
                 Tables\Columns\ImageColumn::make('image')
-                    ->size(60),
+                    ->imageSize(60)
+                    ->visibility('public'),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
                     ->sortable(),
