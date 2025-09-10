@@ -9,10 +9,6 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
-use Intervention\Image\ImageManager;
-use Intervention\Image\Drivers\Gd\Driver;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 
 final class BannerForm
 {
@@ -35,6 +31,8 @@ final class BannerForm
                     ->imageCropAspectRatio('16:9')
                     ->imageResizeTargetWidth('1200')
                     ->imageResizeTargetHeight('675')
+                    ->imageEditorEmptyFillColor('#ffffff')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png'])
                     ->required()
                     ->columnSpanFull(),
 
