@@ -9,10 +9,13 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6">
-                <h1 class="hero-title">Welcome to Shopping Store</h1>
-                <p class="hero-subtitle">Discover amazing products at unbeatable prices. Shop with confidence and enjoy fast, secure delivery.</p>
+                @php
+                    $firstBanner = \App\Models\Banner::active()->ordered()->first();
+                @endphp
+                <h1 class="hero-title">{{ $firstBanner->title ?? 'Welcome to ' . config('app.name') }}</h1>
+                <p class="hero-subtitle">{{ $firstBanner->description ?? 'Discover amazing products at unbeatable prices. Shop with confidence and enjoy fast, secure delivery.' }}</p>
                 <div class="d-flex gap-3">
-                    <a href="{{ route('products') }}" class="btn btn-light btn-lg">
+                    <a href="{{ $firstBanner->link ?? route('products') }}" class="btn btn-light btn-lg">
                         <i class="fas fa-shopping-bag me-2"></i>Shop Now
                     </a>
                     <a href="{{ route('about') }}" class="btn btn-outline-light btn-lg">
@@ -23,15 +26,21 @@
             <div class="col-lg-6">
                 <div class="swiper hero-swiper">
                     <div class="swiper-wrapper">
-                        <div class="swiper-slide">
-                            <img src="{{ asset('assets/images/slider-image/sample-1.jpg') }}" alt="Hero Image 1" class="img-fluid rounded">
-                        </div>
-                        <div class="swiper-slide">
-                            <img src="{{ asset('assets/images/slider-image/sample-2.jpg') }}" alt="Hero Image 2" class="img-fluid rounded">
-                        </div>
-                        <div class="swiper-slide">
-                            <img src="{{ asset('assets/images/slider-image/sample-3.jpg') }}" alt="Hero Image 3" class="img-fluid rounded">
-                        </div>
+                        @forelse(\App\Models\Banner::active()->ordered()->get() as $banner)
+                            <div class="swiper-slide">
+                                @if($banner->link)
+                                    <a href="{{ $banner->link }}">
+                                        <img src="{{ $banner->image }}" alt="{{ $banner->title }}" class="img-fluid rounded">
+                                    </a>
+                                @else
+                                    <img src="{{ $banner->image }}" alt="{{ $banner->title }}" class="img-fluid rounded">
+                                @endif
+                            </div>
+                        @empty
+                            <div class="swiper-slide">
+                                <img src="{{ asset('assets/images/slider-image/sample-1.jpg') }}" alt="Default Banner" class="img-fluid rounded">
+                            </div>
+                        @endforelse
                     </div>
                     <div class="swiper-pagination"></div>
                 </div>
