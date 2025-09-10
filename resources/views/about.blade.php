@@ -138,10 +138,7 @@
     <section class="py-5">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <!-- Image removed -->
-                </div>
-                <div class="col-lg-6">
+                <div class="col-lg-12">
                     <h2 class="mb-4">Our Mission</h2>
                     <p class="lead">To democratize access to quality products while providing an exceptional shopping experience that exceeds customer expectations.</p>
                     <p>We are committed to:</p>
