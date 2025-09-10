@@ -25,6 +25,7 @@ final class BannerForm
                     ->columnSpanFull(),
 
                 FileUpload::make('image')
+                    ->label('Banner Image')
                     ->image()
                     ->directory('banners')
                     ->imageEditor()
