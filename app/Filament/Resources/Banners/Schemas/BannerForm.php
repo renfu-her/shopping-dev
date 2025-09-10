@@ -41,16 +41,19 @@ final class BannerForm
                     ->required()
                     ->columnSpanFull()
                     ->getUploadedFileUsing(function ($file) {
+                        // $file is a string path to the temporary file
+                        $tempPath = $file;
+                        
                         // Process image with Intervention Image
                         $imageManager = new ImageManager(new Driver());
-                        $image = $imageManager->read($file->getPathname());
+                        $image = $imageManager->read($tempPath);
                         
                         // Scale image to target dimensions while maintaining aspect ratio
                         $image->scale(1200, 675);
                         
                         // Generate unique filename with original extension
-                        $extension = $file->getClientOriginalExtension();
-                        $filename = Str::uuid() . '.' . $extension;
+                        $originalExtension = pathinfo($tempPath, PATHINFO_EXTENSION);
+                        $filename = Str::uuid() . '.' . $originalExtension;
                         $processedPath = storage_path('app/public/banners/' . $filename);
                         
                         // Ensure directory exists
@@ -61,14 +64,8 @@ final class BannerForm
                         // Save processed image
                         $image->save($processedPath);
                         
-                        // Return the processed file
-                        return new \Illuminate\Http\UploadedFile(
-                            $processedPath,
-                            $filename,
-                            $file->getMimeType(),
-                            null,
-                            true
-                        );
+                        // Return the processed file path
+                        return $processedPath;
                     }),
 
                 TextInput::make('link')
