@@ -29,33 +29,35 @@ final class BannerForm
                     ->columnSpanFull(),
 
                 FileUpload::make('image')
-                    ->label('主要圖片')
                     ->image()
+                    ->directory('banners')
                     ->imageEditor()
-                    ->columnSpanFull()
-                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                    ->downloadable()
-                    ->openable()
-                    ->getUploadedFileNameForStorageUsing(
-                        fn($file): string => (string) str(Str::uuid7() . '.webp')
-                    )
-                    ->saveUploadedFileUsing(function ($file) {
-                        $manager = new ImageManager(new Driver());
-                        $image = $manager->read($file);
+                    ->imageCropAspectRatio('16:9')
+                    ->imageResizeTargetWidth('1200')
+                    ->imageResizeTargetHeight('675')
+                    ->getUploadedFileUsing(function ($file) {
+                        $imageManager = new ImageManager(new Driver());
+                        $image = $imageManager->read($file->getPathname());
                         $image->scale(1200, 675);
                         $filename = Str::uuid7()->toString() . '.webp';
-
-                        if (!file_exists(storage_path('app/public/banners'))) {
-                            mkdir(storage_path('app/public/banners'), 0755, true);
-                        }
-                        $image->toWebp(80)->save(storage_path('app/public/courses/' . $filename));
+                        $image->toWebp(80)->save(storage_path('app/public/banners/' . $filename));
+                        return 'banners/' . $filename;
+                    })
+                    ->saveUploadedFileUsing(function ($file) {
+                        $imageManager = new ImageManager(new Driver());
+                        $image = $imageManager->read($file->getPathname());
+                        $image->scale(1200, 675);
+                        $filename = Str::uuid7()->toString() . '.webp';
+                        $image->toWebp(80)->save(storage_path('app/public/banners/' . $filename));
                         return 'banners/' . $filename;
                     })
                     ->deleteUploadedFileUsing(function ($file) {
                         if ($file) {
                             Storage::disk('public')->delete($file);
                         }
-                    }),
+                    })
+                    ->required()
+                    ->columnSpanFull(),
 
                 TextInput::make('link')
                     ->url()
