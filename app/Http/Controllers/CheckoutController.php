@@ -46,6 +46,8 @@ final class CheckoutController extends Controller
 
             // Get authenticated member
             $member = Auth::guard('member')->user();
+
+            dd($member);
             
             if (!$member) {
                 return response()->json([
@@ -149,6 +151,7 @@ final class CheckoutController extends Controller
 
             // Get authenticated member from session
             $member = Auth::guard('member')->user();
+            dd($member);
             
             if (!$member) {
                 return response()->json([
