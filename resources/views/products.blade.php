@@ -50,15 +50,13 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Search Filter -->
-                    <div class="card mt-3">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">
-                                <i class="fas fa-search me-2"></i>Search
-                            </h5>
-                        </div>
-                        <div class="card-body">
+                <!-- Main Content -->
+                <div class="col-lg-9">
+                    <!-- Search and Sort Controls -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
                             <div class="input-group">
                                 <input type="text" id="search-input" class="form-control"
                                     placeholder="Search products...">
@@ -67,16 +65,7 @@
                                 </button>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Sort Filter -->
-                    <div class="card mt-3">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">
-                                <i class="fas fa-sort me-2"></i>Sort By
-                            </h5>
-                        </div>
-                        <div class="card-body">
+                        <div class="col-md-4">
                             <select id="sort-select" class="form-select">
                                 <option value="created_at-desc">Newest First</option>
                                 <option value="created_at-asc">Oldest First</option>
@@ -86,21 +75,18 @@
                                 <option value="price-desc">Price High to Low</option>
                             </select>
                         </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-secondary w-100" id="clear-filters" style="display: none;">
+                                <i class="fas fa-times me-1"></i>Clear
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Main Content -->
-                <div class="col-lg-9">
                     <!-- Results Header -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div>
                             <h4 id="results-title">All Products</h4>
                             <p class="text-muted mb-0" id="results-count">Loading...</p>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-outline-secondary" id="clear-filters" style="display: none;">
-                                <i class="fas fa-times me-1"></i>Clear Filters
-                            </button>
                         </div>
                     </div>
 
@@ -239,9 +225,36 @@
             border-color: #0d6efd;
         }
 
+        /* Search and Sort Controls */
+        .input-group .form-control {
+            border-right: 0;
+        }
+
+        .input-group .btn {
+            border-left: 0;
+        }
+
+        .form-select {
+            border-color: #ced4da;
+        }
+
+        .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        /* Responsive adjustments */
         @media (max-width: 991.98px) {
             .col-lg-3 {
                 margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .row.mb-4 .col-md-6,
+            .row.mb-4 .col-md-4,
+            .row.mb-4 .col-md-2 {
+                margin-bottom: 1rem;
             }
         }
     </style>
