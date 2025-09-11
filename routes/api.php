@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\MemberController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\CheckoutController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -59,6 +61,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/cart/coupon/apply', [CartController::class, 'applyCoupon']);
         Route::delete('/cart/coupon/remove', [CartController::class, 'removeCoupon']);
     });
+
+    // ECPay payment routes
+    Route::post('/orders/ecpay', [CheckoutController::class, 'createECPayOrder']);
 });
 
 // Protected routes (require authentication)
@@ -88,7 +93,6 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
     // Order routes
     Route::post('/orders', [OrderController::class, 'store']);
-    Route::post('/orders/ecpay', [App\Http\Controllers\CheckoutController::class, 'createECPayOrder']);
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{order}', [OrderController::class, 'show']);
     Route::put('/orders/{order}/cancel', [OrderController::class, 'cancel']);
