@@ -276,18 +276,50 @@
             }
 
             checkMemberStatus() {
-                const token = localStorage.getItem('member_token');
+                // Check if user is authenticated via Laravel session
+                const isAuthenticated = @json(auth()->guard('member')->check());
                 
-                if (token) {
-                    // User has a token, try to load member data and show shipping section
-                    this.loadMemberData().then(() => {
-                        document.getElementById('member-login-section').style.display = 'none';
-                        document.getElementById('shipping-section').style.display = 'block';
-                    });
+                if (isAuthenticated) {
+                    // User is authenticated via session, show shipping section directly
+                    document.getElementById('member-login-section').style.display = 'none';
+                    document.getElementById('shipping-section').style.display = 'block';
+                    
+                    // Try to load member data from session
+                    this.loadMemberDataFromSession();
                 } else {
-                    // No token, show login section
-                    document.getElementById('member-login-section').style.display = 'block';
-                    document.getElementById('shipping-section').style.display = 'none';
+                    // Check localStorage token as fallback
+                    const token = localStorage.getItem('member_token');
+                    
+                    if (token) {
+                        // User has a token, try to load member data and show shipping section
+                        this.loadMemberData().then(() => {
+                            document.getElementById('member-login-section').style.display = 'none';
+                            document.getElementById('shipping-section').style.display = 'block';
+                        });
+                    } else {
+                        // No authentication, show login section
+                        document.getElementById('member-login-section').style.display = 'block';
+                        document.getElementById('shipping-section').style.display = 'none';
+                    }
+                }
+            }
+
+            loadMemberDataFromSession() {
+                // Get member data from Laravel session
+                const memberData = @json(auth()->guard('member')->user());
+                
+                if (memberData) {
+                    // Pre-fill form with member data from session
+                    document.getElementById('fullName').value = memberData.name || '';
+                    document.getElementById('email').value = memberData.email || '';
+                    document.getElementById('phone').value = memberData.phone || '';
+                    document.getElementById('address').value = memberData.address || '';
+                    document.getElementById('city').value = memberData.city || '';
+                    document.getElementById('state').value = memberData.state || '';
+                    document.getElementById('zipCode').value = memberData.postal_code || '';
+                    
+                    // Show a message that form was pre-filled
+                    this.showToast('Form pre-filled with your member information', 'info');
                 }
             }
 
