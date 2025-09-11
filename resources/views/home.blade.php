@@ -30,10 +30,10 @@
                             <div class="swiper-slide">
                                 @if($banner->link)
                                     <a href="{{ $banner->link }}">
-                                        <img src="{{ $banner->image }}" alt="{{ $banner->title }}" class="img-fluid rounded">
+                                        <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}" class="img-fluid rounded">
                                     </a>
                                 @else
-                                    <img src="{{ $banner->image }}" alt="{{ $banner->title }}" class="img-fluid rounded">
+                                    <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}" class="img-fluid rounded">
                                 @endif
                             </div>
                         @empty
