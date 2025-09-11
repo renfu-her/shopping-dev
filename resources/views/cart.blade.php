@@ -215,7 +215,9 @@
                     });
 
                     if (response.ok) {
-                        this.cartData = await response.json();
+                        const result = await response.json();
+                        this.cartData = result.data; // Extract data from API response
+                        console.log('Cart data:', this.cartData); // Debug log
                         this.renderCart();
                         this.loadRelatedProducts();
                     } else {
@@ -271,16 +273,18 @@
                 div.innerHTML = `
                     <div class="row align-items-center">
                         <div class="col-md-2">
-                            <img src="${item.product.image || '/images/placeholder.jpg'}" 
+                            <img src="${item.product.image || '/assets/images/product-image/1.jpg'}" 
                                  alt="${item.product.name}" 
-                                 class="product-image">
+                                 class="product-image"
+                                 style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;"
+                                 onerror="this.src='/assets/images/product-image/1.jpg'">
                         </div>
                         <div class="col-md-4">
                             <h6 class="mb-1">${item.product.name}</h6>
-                            <small class="text-muted">${item.product.description || ''}</small>
+                            <small class="text-muted">${item.product.short_description || item.product.description || ''}</small>
                         </div>
                         <div class="col-md-2">
-                            <span class="fw-bold">$${parseFloat(item.product.price).toFixed(2)}</span>
+                            <span class="fw-bold">$${parseFloat(item.price).toFixed(2)}</span>
                         </div>
                         <div class="col-md-2">
                             <div class="input-group">
@@ -302,7 +306,7 @@
                             </div>
                         </div>
                         <div class="col-md-1">
-                            <span class="fw-bold">$${(parseFloat(item.product.price) * item.quantity).toFixed(2)}</span>
+                            <span class="fw-bold">$${(parseFloat(item.price) * item.quantity).toFixed(2)}</span>
                         </div>
                         <div class="col-md-1">
                             <button class="btn btn-outline-danger btn-sm" 
@@ -319,8 +323,8 @@
             updateCartSummary() {
                 const subtotal = this.cartData.subtotal || 0;
                 const discount = this.cartData.discount || 0;
-                const shipping = this.cartData.shipping || 0;
-                const total = subtotal - discount + shipping;
+                const shipping = 0; // Free shipping for now
+                const total = this.cartData.total || (subtotal - discount + shipping);
 
                 document.getElementById('subtotal').textContent = `$${parseFloat(subtotal).toFixed(2)}`;
                 document.getElementById('discount').textContent = `-$${parseFloat(discount).toFixed(2)}`;
@@ -329,8 +333,11 @@
             }
 
             updateCartCount() {
-                const count = this.cartData.items ? this.cartData.items.length : 0;
-                document.getElementById('cart-badge').textContent = count;
+                const count = this.cartData.items_count || (this.cartData.items ? this.cartData.items.length : 0);
+                const cartBadge = document.getElementById('cart-badge');
+                if (cartBadge) {
+                    cartBadge.textContent = count;
+                }
             }
 
             async updateQuantity(itemId, newQuantity) {
@@ -353,7 +360,8 @@
                     });
 
                     if (response.ok) {
-                        this.cartData = await response.json();
+                        const result = await response.json();
+                        this.cartData = result.data;
                         this.renderCart();
                         this.showToast('Cart updated successfully', 'success');
                     } else {
@@ -381,7 +389,8 @@
                     });
 
                     if (response.ok) {
-                        this.cartData = await response.json();
+                        const result = await response.json();
+                        this.cartData = result.data;
                         this.renderCart();
                         this.showToast('Item removed from cart', 'success');
                     } else {
@@ -414,7 +423,8 @@
                     });
 
                     if (response.ok) {
-                        this.cartData = { items: [], subtotal: 0, discount: 0, shipping: 0 };
+                        const result = await response.json();
+                        this.cartData = result.data;
                         this.renderCart();
                         this.showToast('Cart cleared successfully', 'success');
                     } else {
@@ -449,7 +459,7 @@
                     const result = await response.json();
 
                     if (response.ok) {
-                        this.cartData = result;
+                        this.cartData = result.data;
                         this.renderCart();
                         this.showToast('Coupon applied successfully!', 'success');
                         document.getElementById('coupon-code').value = '';
@@ -474,7 +484,8 @@
                     });
 
                     if (response.ok) {
-                        this.cartData = await response.json();
+                        const result = await response.json();
+                        this.cartData = result.data;
                         this.renderCart();
                         this.showToast('Coupon removed successfully', 'success');
                     } else {
@@ -500,8 +511,8 @@
                 try {
                     const response = await fetch(`${this.apiBaseUrl}/products?limit=6`);
                     if (response.ok) {
-                        const data = await response.json();
-                        this.renderRelatedProducts(data.data || []);
+                        const result = await response.json();
+                        this.renderRelatedProducts(result.data || []);
                     }
                 } catch (error) {
                     console.error('Error loading related products:', error);
@@ -517,10 +528,12 @@
                     productElement.className = 'swiper-slide';
                     productElement.innerHTML = `
                         <div class="related-product">
-                            <img src="${product.image || '/images/placeholder.jpg'}" 
-                                 alt="${product.name}">
+                            <img src="${product.image || '/assets/images/product-image/1.jpg'}" 
+                                 alt="${product.name}"
+                                 style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px;"
+                                 onerror="this.src='/assets/images/product-image/1.jpg'">
                             <h6 class="mt-2">${product.name}</h6>
-                            <p class="text-muted small">${product.description || ''}</p>
+                            <p class="text-muted small">${product.short_description || product.description || ''}</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fw-bold text-primary">$${parseFloat(product.price).toFixed(2)}</span>
                                 <button class="btn btn-sm btn-outline-primary" 
@@ -633,5 +646,76 @@
             cart = new ShoppingCart();
         });
     </script>
+@endpush
+
+@push('styles')
+<style>
+    .cart-item {
+        transition: background-color 0.3s ease;
+    }
+    
+    .cart-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .product-image {
+        border: 1px solid #dee2e6;
+    }
+    
+    .quantity-input {
+        text-align: center;
+        width: 60px;
+    }
+    
+    .related-product {
+        text-align: center;
+        padding: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .related-product:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .empty-cart {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+    
+    .empty-cart i {
+        font-size: 4rem;
+        color: #6c757d;
+        margin-bottom: 1rem;
+    }
+    
+    .cart-summary {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .coupon-section {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+    
+    #coupon-message {
+        font-size: 0.875rem;
+    }
+    
+    .coupon-message.success {
+        color: #198754;
+    }
+    
+    .coupon-message.error {
+        color: #dc3545;
+    }
+</style>
 @endpush
 
