@@ -34,13 +34,9 @@
                             </h4>
                             <form id="shippingForm">
                                 <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label for="firstName" class="form-label">First Name *</label>
-                                        <input type="text" class="form-control" id="firstName" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="lastName" class="form-label">Last Name *</label>
-                                        <input type="text" class="form-control" id="lastName" required>
+                                    <div class="col-12">
+                                        <label for="fullName" class="form-label">Full Name *</label>
+                                        <input type="text" class="form-control" id="fullName" required>
                                     </div>
                                     <div class="col-12">
                                         <label for="email" class="form-label">Email Address *</label>
@@ -233,8 +229,11 @@
                 try {
                     const response = await fetch(`${this.apiBaseUrl}/cart`);
                     if (response.ok) {
-                        this.cartData = await response.json();
+                        const result = await response.json();
+                        this.cartData = result.data; // Extract data from API response
+                        console.log('Checkout cart data:', this.cartData); // Debug log
                         this.renderOrderSummary();
+                        this.loadMemberData(); // Load member data to pre-fill form
                         document.getElementById('checkout-loading').style.display = 'none';
                         document.getElementById('checkout-content').style.display = 'block';
                     } else {
@@ -243,6 +242,30 @@
                 } catch (error) {
                     console.error('Error loading cart data:', error);
                     this.showError('Unable to load cart data. Please try again.');
+                }
+            }
+
+            async loadMemberData() {
+                try {
+                    const response = await fetch(`${this.apiBaseUrl}/member/auth/me`, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('member_token')}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        const memberData = result.data;
+                        
+                        // Pre-fill form with member data
+                        if (memberData) {
+                            document.getElementById('fullName').value = memberData.name || '';
+                            document.getElementById('email').value = memberData.email || '';
+                        }
+                    }
+                } catch (error) {
+                    console.log('No member data available or not logged in');
                 }
             }
 
@@ -264,9 +287,10 @@
                     itemElement.className = 'd-flex justify-content-between align-items-center mb-3';
                     itemElement.innerHTML = `
                         <div class="d-flex align-items-center">
-                            <img src="${item.product.image || '/example/assets/images/product-image/1.jpg'}" 
+                            <img src="${item.product.image || '/assets/images/product-image/1.jpg'}" 
                                  alt="${item.product.name}" 
-                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; margin-right: 10px;">
+                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; margin-right: 10px;"
+                                 onerror="this.src='/assets/images/product-image/1.jpg'">
                             <div>
                                 <h6 class="mb-0">${item.product.name}</h6>
                                 <small class="text-muted">Qty: ${item.quantity}</small>
@@ -308,7 +332,7 @@
             }
 
             validateShippingForm() {
-                const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state', 'zipCode'];
+                const requiredFields = ['fullName', 'email', 'phone', 'address', 'city', 'state', 'zipCode'];
                 let isValid = true;
 
                 requiredFields.forEach(field => {
@@ -361,8 +385,7 @@
 
             collectShippingData() {
                 this.shippingData = {
-                    firstName: document.getElementById('firstName').value,
-                    lastName: document.getElementById('lastName').value,
+                    fullName: document.getElementById('fullName').value,
                     email: document.getElementById('email').value,
                     phone: document.getElementById('phone').value,
                     company: document.getElementById('company').value,
@@ -409,7 +432,7 @@
                         <div class="col-md-6">
                             <h6>Shipping Address</h6>
                             <p>
-                                ${this.shippingData.firstName} ${this.shippingData.lastName}<br>
+                                ${this.shippingData.fullName}<br>
                                 ${this.shippingData.address}<br>
                                 ${this.shippingData.city}, ${this.shippingData.state} ${this.shippingData.zipCode}<br>
                                 ${this.shippingData.phone}
@@ -477,11 +500,14 @@
 
             async updateCartCount() {
                 try {
-                    const response = await fetch(`${this.apiBaseUrl}/cart`);
+                    const response = await fetch(`${this.apiBaseUrl}/cart/count`);
                     if (response.ok) {
-                        const cartData = await response.json();
-                        const count = cartData.items ? cartData.items.length : 0;
-                        document.getElementById('cart-badge').textContent = count;
+                        const result = await response.json();
+                        const count = result.count || 0;
+                        const cartBadge = document.getElementById('cart-badge');
+                        if (cartBadge) {
+                            cartBadge.textContent = count;
+                        }
                     }
                 } catch (error) {
                     console.error('Error updating cart count:', error);
@@ -559,4 +585,108 @@
             window.checkout = checkout; // Make it globally accessible
         });
     </script>
+@endpush
+
+@push('styles')
+<style>
+    .checkout-step {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #6c757d;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 1rem;
+    }
+    
+    .step-number.active {
+        background-color: #0d6efd;
+    }
+    
+    .step-number.completed {
+        background-color: #198754;
+    }
+    
+    .form-section {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .order-summary {
+        background-color: #f8f9fa;
+        padding: 2rem;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        position: sticky;
+        top: 2rem;
+    }
+    
+    .payment-method {
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .payment-method:hover {
+        border-color: #0d6efd;
+        background-color: #f8f9fa;
+    }
+    
+    .payment-method.selected {
+        border-color: #0d6efd;
+        background-color: #e7f1ff;
+    }
+    
+    .btn-checkout {
+        background-color: #198754;
+        border-color: #198754;
+        color: white;
+        padding: 1rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-checkout:hover {
+        background-color: #157347;
+        border-color: #146c43;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(25, 135, 84, 0.3);
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .is-invalid {
+        border-color: #dc3545;
+    }
+    
+    .is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+</style>
 @endpush
