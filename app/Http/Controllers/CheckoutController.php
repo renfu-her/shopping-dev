@@ -45,7 +45,7 @@ final class CheckoutController extends Controller
             DB::beginTransaction();
 
             // Get authenticated member
-            $member = Auth::guard('member-api')->user();
+            $member = Auth::guard('member')->user();
             
             if (!$member) {
                 return response()->json([
