@@ -54,8 +54,14 @@ final class CheckoutController extends Controller
                 ], 401);
             }
             
-            // Get cart data
-            $cart = Cart::where('member_id', $member->id)->first();
+            // Get cart data - for authenticated members, we need to find cart by session or create one
+            $sessionId = $request->session()->getId();
+            $cart = Cart::where('session_id', $sessionId)->first();
+            
+            // If no cart found by session, try to find by user_id (for legacy support)
+            if (!$cart) {
+                $cart = Cart::where('user_id', $member->id)->first();
+            }
             
             if (!$cart || $cart->items()->count() === 0) {
                 return response()->json([
@@ -157,8 +163,14 @@ final class CheckoutController extends Controller
                 ], 401);
             }
             
-            // Get cart data
-            $cart = Cart::where('member_id', $member->id)->first();
+            // Get cart data - for authenticated members, we need to find cart by session or create one
+            $sessionId = $request->session()->getId();
+            $cart = Cart::where('session_id', $sessionId)->first();
+            
+            // If no cart found by session, try to find by user_id (for legacy support)
+            if (!$cart) {
+                $cart = Cart::where('user_id', $member->id)->first();
+            }
             
             if (!$cart || $cart->items()->count() === 0) {
                 return response()->json([
