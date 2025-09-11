@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 class Order extends Model
 {
     protected $fillable = [
+        'member_id',
         'user_id',
         'order_number',
         'status',
@@ -21,10 +22,18 @@ class Order extends Model
         'shipping_amount',
         'discount_amount',
         'total_amount',
+        'shipping_name',
+        'shipping_email',
+        'shipping_phone',
         'shipping_address',
+        'shipping_city',
+        'shipping_zip_code',
         'billing_address',
         'coupon_data',
         'notes',
+        'ecpay_trade_no',
+        'ecpay_rtn_code',
+        'ecpay_rtn_msg',
         'shipped_at',
         'delivered_at',
     ];
@@ -57,6 +66,11 @@ class Order extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function member(): BelongsTo
+    {
+        return $this->belongsTo(Member::class);
     }
 
     public function items(): HasMany
@@ -145,7 +159,7 @@ class Order extends Model
     // Accessors
     public function getFormattedTotalAttribute(): string
     {
-        return '$' . number_format($this->total_amount, 2);
+        return '$' . number_format((float) $this->total_amount, 2);
     }
 
     public function getStatusLabelAttribute(): string

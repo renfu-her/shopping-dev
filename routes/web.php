@@ -1,18 +1,21 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ContactController;
 
 Route::get('/', function () {
     return view('home');
 })->name('home');
 
 // Authentication Routes
-Route::get('/auth', [App\Http\Controllers\AuthController::class, 'index'])->name('auth');
-Route::get('/login', [App\Http\Controllers\AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
-Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
-Route::get('/register', [App\Http\Controllers\AuthController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
+Route::get('/auth', [AuthController::class, 'index'])->name('auth');
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
 
 // Products page (placeholder)
 Route::get('/products', function () {
@@ -27,10 +30,14 @@ Route::middleware(['auth:member', 'throttle:60,1'])->group(function () {
     })->name('cart');
     
     // Checkout page (requires member authentication)
-    Route::get('/checkout', function () {
-        return view('checkout');
-    })->name('checkout');
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+    
+    // Checkout success page
+    Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
 });
+
+// ECPay payment routes (no authentication required for return URL)
+Route::post('/checkout/ecpay/return', [CheckoutController::class, 'handleECPayReturn'])->name('checkout.ecpay.return');
 
 // Product detail page
 Route::get('/product/{id}', function ($id) {
@@ -48,4 +55,4 @@ Route::get('/contact', function () {
 })->name('contact');
 
 // Contact form submission
-Route::post('/contact', [App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');

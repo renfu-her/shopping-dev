@@ -88,6 +88,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
     // Order routes
     Route::post('/orders', [OrderController::class, 'store']);
+    Route::post('/orders/ecpay', [App\Http\Controllers\CheckoutController::class, 'createECPayOrder']);
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{order}', [OrderController::class, 'show']);
     Route::put('/orders/{order}/cancel', [OrderController::class, 'cancel']);

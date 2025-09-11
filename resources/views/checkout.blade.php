@@ -133,71 +133,31 @@
                                 <i class="fas fa-credit-card me-2"></i>Payment Information
                             </h4>
                             
-                            <!-- Payment Methods -->
+                            <!-- ECPay Payment Method -->
                             <div class="mb-4">
-                                <h6>Select Payment Method</h6>
-                                <div class="payment-method" data-method="card" onclick="selectPaymentMethod('card')">
+                                <div class="payment-method selected" data-method="ecpay">
                                     <div class="d-flex align-items-center">
-                                        <input type="radio" name="paymentMethod" value="card" class="me-3">
-                                        <i class="fas fa-credit-card fa-2x me-3"></i>
+                                        <i class="fas fa-credit-card fa-2x me-3 text-primary"></i>
                                         <div>
-                                            <h6 class="mb-0">Credit/Debit Card</h6>
-                                            <small class="text-muted">Visa, MasterCard, American Express</small>
+                                            <h6 class="mb-0">Credit Card Payment</h6>
+                                            <small class="text-muted">Secure payment powered by ECPay</small>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="payment-method" data-method="paypal" onclick="selectPaymentMethod('paypal')">
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" name="paymentMethod" value="paypal" class="me-3">
-                                        <i class="fab fa-paypal fa-2x me-3 text-primary"></i>
-                                        <div>
-                                            <h6 class="mb-0">PayPal</h6>
-                                            <small class="text-muted">Pay with your PayPal account</small>
-                                        </div>
-                                    </div>
+                                
+                                <div class="alert alert-info mt-3">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Secure Payment:</strong> Your payment will be processed securely through ECPay's payment gateway. 
+                                    You will be redirected to ECPay's secure payment page to complete your transaction.
                                 </div>
-                                <div class="payment-method" data-method="apple" onclick="selectPaymentMethod('apple')">
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" name="paymentMethod" value="apple" class="me-3">
-                                        <i class="fab fa-apple-pay fa-2x me-3"></i>
-                                        <div>
-                                            <h6 class="mb-0">Apple Pay</h6>
-                                            <small class="text-muted">Pay with Apple Pay</small>
-                                        </div>
-                                    </div>
+                                
+                                <div class="alert alert-warning mt-2">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Test Environment:</strong> This is a test environment. Use ECPay test credit card numbers for testing:
+                                    <br>• Visa: 4000-2211-1111-1111
+                                    <br>• MasterCard: 5555-5555-5555-4444
+                                    <br>• Any future expiry date and any 3-digit CVV
                                 </div>
-                            </div>
-
-                            <!-- Card Details -->
-                            <div id="card-details" style="display: none;">
-                                <form id="paymentForm">
-                                    <div class="row g-3">
-                                        <div class="col-12">
-                                            <label for="cardNumber" class="form-label">Card Number *</label>
-                                            <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="expiryDate" class="form-label">Expiry Date *</label>
-                                            <input type="text" class="form-control" id="expiryDate" placeholder="MM/YY" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="cvv" class="form-label">CVV *</label>
-                                            <input type="text" class="form-control" id="cvv" placeholder="123" required>
-                                        </div>
-                                        <div class="col-12">
-                                            <label for="cardName" class="form-label">Name on Card *</label>
-                                            <input type="text" class="form-control" id="cardName" required>
-                                        </div>
-                                        <div class="col-12">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="saveCard">
-                                                <label class="form-check-label" for="saveCard">
-                                                    Save this card for future purchases
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
                             </div>
                         </div>
 
@@ -468,33 +428,7 @@
             }
 
             validatePaymentForm() {
-                const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked');
-                if (!selectedMethod) {
-                    this.showToast('Please select a payment method', 'error');
-                    return false;
-                }
-
-                if (selectedMethod.value === 'card') {
-                    const requiredFields = ['cardNumber', 'expiryDate', 'cvv', 'cardName'];
-                    let isValid = true;
-
-                    requiredFields.forEach(field => {
-                        const input = document.getElementById(field);
-                        if (!input.value.trim()) {
-                            input.classList.add('is-invalid');
-                            isValid = false;
-                        } else {
-                            input.classList.remove('is-invalid');
-                        }
-                    });
-
-                    if (!isValid) {
-                        this.showToast('Please fill in all card details', 'error');
-                    }
-
-                    return isValid;
-                }
-
+                // ECPay payment method is always valid since it's the only option
                 return true;
             }
 
@@ -512,20 +446,9 @@
             }
 
             collectPaymentData() {
-                const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
                 this.paymentData = {
-                    method: selectedMethod
+                    method: 'ecpay'
                 };
-
-                if (selectedMethod === 'card') {
-                    this.paymentData.card = {
-                        number: document.getElementById('cardNumber').value,
-                        expiry: document.getElementById('expiryDate').value,
-                        cvv: document.getElementById('cvv').value,
-                        name: document.getElementById('cardName').value,
-                        saveCard: document.getElementById('saveCard').checked
-                    };
-                }
             }
 
             showPaymentSection() {
@@ -555,9 +478,7 @@
                         <div class="col-md-6">
                             <h6>Payment Method</h6>
                             <p>
-                                ${this.paymentData.method === 'card' ? 'Credit/Debit Card ending in ' + this.paymentData.card.number.slice(-4) : 
-                                  this.paymentData.method === 'paypal' ? 'PayPal' : 
-                                  this.paymentData.method === 'apple' ? 'Apple Pay' : 'Unknown'}
+                                <i class="fas fa-credit-card me-2"></i>Credit Card Payment via ECPay
                             </p>
                         </div>
                     </div>
@@ -572,7 +493,8 @@
                         items: this.cartData.items
                     };
 
-                    const response = await fetch(`${this.apiBaseUrl}/orders`, {
+                    // Create order and get ECPay payment parameters
+                    const response = await fetch(`${this.apiBaseUrl}/orders/ecpay`, {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
@@ -583,19 +505,43 @@
                     });
 
                     if (response.ok) {
-                        const orderResult = await response.json();
-                        this.showToast('Order placed successfully!', 'success');
-                        setTimeout(() => {
-                            window.location.href = `/order-success/${orderResult.data.id}`;
-                        }, 2000);
+                        const result = await response.json();
+                        
+                        // Redirect to ECPay payment page
+                        this.redirectToECPay(result.data.ecpay_params);
                     } else {
                         const error = await response.json();
-                        this.showToast(error.message || 'Error placing order', 'error');
+                        this.showToast(error.message || 'Error creating order', 'error');
                     }
                 } catch (error) {
                     console.error('Error placing order:', error);
                     this.showToast('Error placing order', 'error');
                 }
+            }
+
+            redirectToECPay(ecpayParams) {
+                // Create a form to submit to ECPay
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5'; // ECPay Test Environment
+                form.target = '_self';
+
+                // Add ECPay parameters to form
+                Object.keys(ecpayParams).forEach(key => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = ecpayParams[key];
+                    form.appendChild(input);
+                });
+
+                // Show loading message
+                this.showToast('Redirecting to secure payment page...', 'info');
+
+                // Submit form to ECPay
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
             }
 
             updateStepDisplay() {
@@ -668,23 +614,6 @@
         }
 
         // Global functions
-        function selectPaymentMethod(method) {
-            // Remove selected class from all payment methods
-            document.querySelectorAll('.payment-method').forEach(pm => {
-                pm.classList.remove('selected');
-            });
-            
-            // Add selected class to clicked method
-            document.querySelector(`[data-method="${method}"]`).classList.add('selected');
-            
-            // Show/hide card details
-            const cardDetails = document.getElementById('card-details');
-            if (method === 'card') {
-                cardDetails.style.display = 'block';
-            } else {
-                cardDetails.style.display = 'none';
-            }
-        }
 
         async function loginMember() {
             const email = document.getElementById('memberEmail').value;
@@ -894,6 +823,16 @@
         background-color: #6c757d;
         border-color: #6c757d;
         color: white;
+    }
+    
+    .alert-warning {
+        background-color: #fff3cd;
+        border-color: #ffeaa7;
+        color: #856404;
+    }
+    
+    .alert-warning .fas {
+        color: #f39c12;
     }
 </style>
 @endpush
