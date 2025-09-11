@@ -56,6 +56,7 @@ final class CheckoutController extends Controller
             
             // Get cart data - for authenticated members, we need to find cart by session or create one
             $sessionId = $request->session()->getId();
+            dd($sessionId);
             $cart = Cart::where('session_id', $sessionId)->first();
             
             // If no cart found by session, try to find by user_id (for legacy support)
