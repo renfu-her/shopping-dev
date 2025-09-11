@@ -71,7 +71,6 @@ class CategoriesTable
                     ->native(false),
             ])
             ->actions([
-                \Filament\Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 \Filament\Tables\Actions\DeleteAction::make(),
             ])

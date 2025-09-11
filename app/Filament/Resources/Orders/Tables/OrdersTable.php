@@ -7,7 +7,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
@@ -117,7 +116,6 @@ class OrdersTable
                     }),
             ])
             ->actions([
-                ViewAction::make(),
                 EditAction::make(),
                 Action::make('mark_shipped')
                     ->label('Mark as Shipped')

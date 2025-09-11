@@ -96,7 +96,6 @@ class ProductsTable
                     ->toggle(),
             ])
             ->actions([
-                \Filament\Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 \Filament\Tables\Actions\DeleteAction::make(),
             ])

@@ -118,7 +118,6 @@ class CouponsTable
                     ->toggle(),
             ])
             ->actions([
-                \Filament\Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 \Filament\Tables\Actions\DeleteAction::make(),
                 \Filament\Tables\Actions\Action::make('duplicate')
