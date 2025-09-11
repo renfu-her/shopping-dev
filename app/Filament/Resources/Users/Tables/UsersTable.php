@@ -6,6 +6,8 @@ use App\Models\User;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\Action;
 use Filament\Forms\Components;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -72,8 +74,8 @@ class UsersTable
             ])
             ->actions([
                 EditAction::make(),
-                \Filament\Tables\Actions\DeleteAction::make(),
-                \Filament\Tables\Actions\Action::make('view_orders')
+                DeleteAction::make(),
+                Action::make('view_orders')
                     ->label('View Orders')
                     ->icon('heroicon-o-shopping-bag')
                     ->color('info')
