@@ -27,8 +27,37 @@
 
                 <div class="row">
                     <div class="col-lg-8">
+                        <!-- Member Login Section -->
+                        <div class="form-section" id="member-login-section">
+                            <h4 class="mb-4">
+                                <i class="fas fa-user me-2"></i>Member Login (Optional)
+                            </h4>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Already a member? Log in to pre-fill your information and enjoy member benefits.
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="memberEmail" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="memberEmail" placeholder="Enter your email">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="memberPassword" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="memberPassword" placeholder="Enter your password">
+                                </div>
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-outline-primary" onclick="loginMember()">
+                                        <i class="fas fa-sign-in-alt me-2"></i>Login as Member
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary ms-2" onclick="continueAsGuest()">
+                                        <i class="fas fa-user-plus me-2"></i>Continue as Guest
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Shipping Information -->
-                        <div class="form-section" id="shipping-section">
+                        <div class="form-section" id="shipping-section" style="display: none;">
                             <h4 class="mb-4">
                                 <i class="fas fa-shipping-fast me-2"></i>Shipping Information
                             </h4>
@@ -223,6 +252,7 @@
             init() {
                 this.loadCartData();
                 this.updateCartCount();
+                this.checkMemberStatus();
             }
 
             async loadCartData() {
@@ -245,27 +275,68 @@
                 }
             }
 
+            checkMemberStatus() {
+                const token = localStorage.getItem('member_token');
+                
+                if (token) {
+                    // User has a token, try to load member data and show shipping section
+                    this.loadMemberData().then(() => {
+                        document.getElementById('member-login-section').style.display = 'none';
+                        document.getElementById('shipping-section').style.display = 'block';
+                    });
+                } else {
+                    // No token, show login section
+                    document.getElementById('member-login-section').style.display = 'block';
+                    document.getElementById('shipping-section').style.display = 'none';
+                }
+            }
+
             async loadMemberData() {
                 try {
+                    const token = localStorage.getItem('member_token');
+                    
+                    // Check if member token exists
+                    if (!token) {
+                        console.log('No member token found - proceeding as guest');
+                        return;
+                    }
+                    
                     const response = await fetch(`${this.apiBaseUrl}/member/auth/me`, {
                         headers: {
                             'Accept': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem('member_token')}`
+                            'Authorization': `Bearer ${token}`
                         }
                     });
                     
                     if (response.ok) {
                         const result = await response.json();
-                        const memberData = result.data;
+                        const memberData = result.data?.member;
                         
                         // Pre-fill form with member data
                         if (memberData) {
                             document.getElementById('fullName').value = memberData.name || '';
                             document.getElementById('email').value = memberData.email || '';
+                            document.getElementById('phone').value = memberData.phone || '';
+                            document.getElementById('address').value = memberData.address || '';
+                            document.getElementById('city').value = memberData.city || '';
+                            document.getElementById('state').value = memberData.state || '';
+                            document.getElementById('zipCode').value = memberData.postal_code || '';
+                            
+                            // Show a message that form was pre-filled
+                            this.showToast('Form pre-filled with your member information', 'info');
                         }
+                    } else if (response.status === 401) {
+                        // Token is invalid or expired, remove it
+                        localStorage.removeItem('member_token');
+                        console.log('Member token expired or invalid - proceeding as guest');
+                        // Show login section
+                        document.getElementById('member-login-section').style.display = 'block';
+                        document.getElementById('shipping-section').style.display = 'none';
+                    } else {
+                        console.log('Failed to load member data - proceeding as guest');
                     }
                 } catch (error) {
-                    console.log('No member data available or not logged in');
+                    console.log('Error loading member data - proceeding as guest:', error);
                 }
             }
 
@@ -572,6 +643,71 @@
             }
         }
 
+        async function loginMember() {
+            const email = document.getElementById('memberEmail').value;
+            const password = document.getElementById('memberPassword').value;
+            
+            if (!email || !password) {
+                if (window.checkout) {
+                    window.checkout.showToast('Please enter both email and password', 'error');
+                }
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/v1/member/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    const token = result.data.token;
+                    
+                    // Store token in localStorage
+                    localStorage.setItem('member_token', token);
+                    
+                    // Hide login section and show shipping section
+                    document.getElementById('member-login-section').style.display = 'none';
+                    document.getElementById('shipping-section').style.display = 'block';
+                    
+                    // Load member data to pre-fill form
+                    if (window.checkout) {
+                        await window.checkout.loadMemberData();
+                        window.checkout.showToast('Login successful! Form pre-filled with your information.', 'success');
+                    }
+                } else {
+                    const error = await response.json();
+                    if (window.checkout) {
+                        window.checkout.showToast(error.message || 'Login failed', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                if (window.checkout) {
+                    window.checkout.showToast('Login failed. Please try again.', 'error');
+                }
+            }
+        }
+
+        function continueAsGuest() {
+            // Hide login section and show shipping section
+            document.getElementById('member-login-section').style.display = 'none';
+            document.getElementById('shipping-section').style.display = 'block';
+            
+            if (window.checkout) {
+                window.checkout.showToast('Continuing as guest. You can still create an account after checkout.', 'info');
+            }
+        }
+
         function proceedToNextStep() {
             if (window.checkout) {
                 window.checkout.proceedToNextStep();
@@ -687,6 +823,34 @@
     .is-invalid:focus {
         border-color: #dc3545;
         box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+    
+    .alert-info {
+        background-color: #e7f3ff;
+        border-color: #b8daff;
+        color: #004085;
+    }
+    
+    .btn-outline-primary {
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: white;
+    }
+    
+    .btn-outline-secondary {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+    
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: white;
     }
 </style>
 @endpush
