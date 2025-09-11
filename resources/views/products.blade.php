@@ -166,6 +166,20 @@
             font-weight: 600;
         }
 
+        .category-link.fw-bold {
+            color: #495057;
+            font-size: 0.95rem;
+        }
+
+        .category-link.fw-bold:hover {
+            color: #0d6efd;
+        }
+
+        .category-link.fw-bold.active {
+            color: #0d6efd;
+            background-color: #e7f1ff;
+        }
+
         .product-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             border: 1px solid #e9ecef;
@@ -329,14 +343,30 @@
             const listGroup = container.querySelector('.list-group');
 
             categories.forEach(category => {
-                const li = document.createElement('li');
-                li.className = 'list-group-item';
-                li.innerHTML = `
-            <a href="#" class="text-decoration-none category-link" data-category-id="${category.id}">
+                // Add parent category
+                const parentLi = document.createElement('li');
+                parentLi.className = 'list-group-item';
+                parentLi.innerHTML = `
+            <a href="#" class="text-decoration-none category-link fw-bold" data-category-id="${category.id}">
                 <i class="fas fa-folder me-2"></i>${category.name}
             </a>
         `;
-                listGroup.appendChild(li);
+                listGroup.appendChild(parentLi);
+
+                // Add child categories if they exist
+                if (category.children && category.children.length > 0) {
+                    category.children.forEach(child => {
+                        const childLi = document.createElement('li');
+                        childLi.className = 'list-group-item';
+                        childLi.style.paddingLeft = '2rem';
+                        childLi.innerHTML = `
+                    <a href="#" class="text-decoration-none category-link" data-category-id="${child.id}">
+                        <i class="fas fa-folder-open me-2"></i>${child.name}
+                    </a>
+                `;
+                        listGroup.appendChild(childLi);
+                    });
+                }
             });
         }
 
