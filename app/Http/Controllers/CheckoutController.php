@@ -26,7 +26,7 @@ final class CheckoutController extends Controller
     }
 
     /**
-     * Create order and generate ECPay payment parameters
+     * Create order and generate ECPay payment parameters (API version)
      */
     public function createECPayOrder(Request $request): JsonResponse
     {
@@ -46,6 +46,109 @@ final class CheckoutController extends Controller
 
             // Get authenticated member
             $member = Auth::guard('member-api')->user();
+            
+            if (!$member) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Authentication required'
+                ], 401);
+            }
+            
+            // Get cart data
+            $cart = Cart::where('member_id', $member->id)->first();
+            
+            if (!$cart || $cart->items()->count() === 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cart is empty'
+                ], 400);
+            }
+
+            // Calculate total amount
+            $totalAmount = 0;
+            $itemNames = [];
+            
+            foreach ($cart->items as $cartItem) {
+                $itemTotal = $cartItem->price * $cartItem->quantity;
+                $totalAmount += $itemTotal;
+                $itemNames[] = $cartItem->product->name;
+            }
+
+            // Generate order number: O + YYYYMMDD + sequence number
+            $orderNumber = $this->generateOrderNumber();
+
+            // Create order
+            $order = Order::create([
+                'member_id' => $member->id,
+                'order_number' => $orderNumber,
+                'status' => 'pending',
+                'total_amount' => $totalAmount,
+                'shipping_name' => $request->shipping['fullName'],
+                'shipping_email' => $request->shipping['email'],
+                'shipping_phone' => $request->shipping['phone'],
+                'shipping_address' => $request->shipping['address'],
+                'shipping_city' => $request->shipping['city'],
+                'shipping_zip_code' => $request->shipping['zipCode'],
+                'payment_method' => 'ecpay',
+                'payment_status' => 'pending',
+            ]);
+
+            // Create order items
+            foreach ($cart->items as $cartItem) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $cartItem->product_id,
+                    'quantity' => $cartItem->quantity,
+                    'price' => $cartItem->price,
+                ]);
+            }
+
+            // Generate ECPay parameters
+            $ecpayParams = $this->generateECPayParams($order, $itemNames, $totalAmount);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order created successfully',
+                'data' => [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'ecpay_params' => $ecpayParams
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create order: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Create order and generate ECPay payment parameters (Session version)
+     */
+    public function createECPayOrderSession(Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+                'shipping' => 'required|array',
+                'shipping.fullName' => 'required|string|max:255',
+                'shipping.email' => 'required|email|max:255',
+                'shipping.phone' => 'required|string|max:20',
+                'shipping.address' => 'required|string|max:500',
+                'shipping.city' => 'required|string|max:100',
+                'shipping.zipCode' => 'required|string|max:10',
+                'items' => 'required|array|min:1',
+            ]);
+
+            DB::beginTransaction();
+
+            // Get authenticated member from session
+            $member = Auth::guard('member')->user();
             
             if (!$member) {
                 return response()->json([

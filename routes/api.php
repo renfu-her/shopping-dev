@@ -65,7 +65,7 @@ Route::prefix('v1')->group(function () {
 });
 
 // Protected routes (require authentication)
-Route::prefix('v1')->middleware('auth:member-api')->group(function () {
+Route::prefix('v1')->middleware('auth:member')->group(function () {
     // Authentication routes
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);

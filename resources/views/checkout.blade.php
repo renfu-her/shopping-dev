@@ -498,13 +498,37 @@
                         items: this.cartData.items
                     };
 
-                    const response = await fetch(`${this.apiBaseUrl}/orders/ecpay`, {
-                        method: 'POST',
-                        headers: {
+                    // Determine which endpoint to use based on authentication method
+                    const isSessionAuthenticated = @json(auth()->guard('member')->check());
+                    const memberToken = localStorage.getItem('member_token');
+                    
+                    let endpoint, headers;
+                    
+                    if (isSessionAuthenticated) {
+                        // Use session-based endpoint
+                        endpoint = '/checkout/ecpay';
+                        headers = {
                             'Accept': 'application/json',
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': this.csrfToken
-                        },
+                        };
+                    } else if (memberToken) {
+                        // Use API endpoint with token
+                        endpoint = `${this.apiBaseUrl}/orders/ecpay`;
+                        headers = {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': this.csrfToken,
+                            'Authorization': `Bearer ${memberToken}`
+                        };
+                    } else {
+                        this.showToast('Authentication required', 'error');
+                        return;
+                    }
+
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: headers,
                         body: JSON.stringify(orderData)
                     });
 

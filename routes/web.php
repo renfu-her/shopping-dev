@@ -34,6 +34,9 @@ Route::middleware(['auth:member', 'throttle:60,1'])->group(function () {
     
     // Checkout success page
     Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
+    
+    // ECPay order creation (session-based authentication)
+    Route::post('/checkout/ecpay', [CheckoutController::class, 'createECPayOrderSession'])->name('checkout.ecpay.session');
 });
 
 // ECPay payment routes (no authentication required for return URL)
