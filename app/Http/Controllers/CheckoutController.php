@@ -65,10 +65,13 @@ final class CheckoutController extends Controller
                 $itemNames[] = $cartItem->product->name;
             }
 
+            // Generate order number: O + YYYYMMDD + sequence number
+            $orderNumber = $this->generateOrderNumber();
+
             // Create order
             $order = Order::create([
                 'member_id' => $member->id,
-                'order_number' => 'ORD' . date('YmdHis') . Str::random(6),
+                'order_number' => $orderNumber,
                 'status' => 'pending',
                 'total_amount' => $totalAmount,
                 'shipping_name' => $request->shipping['fullName'],
@@ -114,6 +117,31 @@ final class CheckoutController extends Controller
                 'message' => 'Failed to create order: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Generate order number: O + YYYYMMDD + sequence number
+     */
+    private function generateOrderNumber(): string
+    {
+        $datePrefix = 'O' . date('Ymd');
+        
+        // Get the last order number for today
+        $lastOrder = Order::where('order_number', 'like', $datePrefix . '%')
+            ->orderBy('order_number', 'desc')
+            ->first();
+        
+        if ($lastOrder) {
+            // Extract sequence number from last order
+            $lastSequence = (int) substr($lastOrder->order_number, -4);
+            $sequence = $lastSequence + 1;
+        } else {
+            // First order of the day
+            $sequence = 1;
+        }
+        
+        // Format sequence number with leading zeros (4 digits)
+        return $datePrefix . str_pad((string) $sequence, 4, '0', STR_PAD_LEFT);
     }
 
     /**

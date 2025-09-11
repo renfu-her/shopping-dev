@@ -147,8 +147,8 @@
                                 
                                 <div class="alert alert-info mt-3">
                                     <i class="fas fa-info-circle me-2"></i>
-                                    <strong>Secure Payment:</strong> Your payment will be processed securely through ECPay's payment gateway. 
-                                    You will be redirected to ECPay's secure payment page to complete your transaction.
+                                    <strong>Secure Payment:</strong> Click "Proceed to Payment" to be redirected to ECPay's secure payment gateway 
+                                    where you can complete your credit card transaction safely.
                                 </div>
                                 
                                 <div class="alert alert-warning mt-2">
@@ -459,7 +459,7 @@
             showReviewSection() {
                 document.getElementById('review-section').style.display = 'block';
                 this.renderOrderReview();
-                document.getElementById('proceed-btn').innerHTML = '<i class="fas fa-lock me-2"></i>Place Order';
+                document.getElementById('proceed-btn').innerHTML = '<i class="fas fa-credit-card me-2"></i>Proceed to Payment';
             }
 
             renderOrderReview() {
@@ -479,6 +479,7 @@
                             <h6>Payment Method</h6>
                             <p>
                                 <i class="fas fa-credit-card me-2"></i>Credit Card Payment via ECPay
+                                <br><small class="text-muted">You will be redirected to ECPay's secure payment page</small>
                             </p>
                         </div>
                     </div>
@@ -487,13 +488,16 @@
 
             async placeOrder() {
                 try {
+                    // Show loading state
+                    this.showToast('Processing your order...', 'info');
+                    
+                    // Create order and get ECPay payment parameters
                     const orderData = {
                         shipping: this.shippingData,
                         payment: this.paymentData,
                         items: this.cartData.items
                     };
 
-                    // Create order and get ECPay payment parameters
                     const response = await fetch(`${this.apiBaseUrl}/orders/ecpay`, {
                         method: 'POST',
                         headers: {
@@ -507,7 +511,7 @@
                     if (response.ok) {
                         const result = await response.json();
                         
-                        // Redirect to ECPay payment page
+                        // Redirect to ECPay payment page immediately
                         this.redirectToECPay(result.data.ecpay_params);
                     } else {
                         const error = await response.json();
@@ -520,11 +524,15 @@
             }
 
             redirectToECPay(ecpayParams) {
+                // Show redirect message
+                this.showToast('Redirecting to ECPay secure payment page...', 'info');
+                
                 // Create a form to submit to ECPay
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5'; // ECPay Test Environment
                 form.target = '_self';
+                form.style.display = 'none';
 
                 // Add ECPay parameters to form
                 Object.keys(ecpayParams).forEach(key => {
@@ -535,13 +543,16 @@
                     form.appendChild(input);
                 });
 
-                // Show loading message
-                this.showToast('Redirecting to secure payment page...', 'info');
-
-                // Submit form to ECPay
+                // Add form to body and submit immediately
                 document.body.appendChild(form);
                 form.submit();
-                document.body.removeChild(form);
+                
+                // Remove form after submission
+                setTimeout(() => {
+                    if (document.body.contains(form)) {
+                        document.body.removeChild(form);
+                    }
+                }, 1000);
             }
 
             updateStepDisplay() {

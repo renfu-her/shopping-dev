@@ -55,11 +55,8 @@ class Order extends Model
     {
         parent::boot();
 
-        static::creating(function ($order) {
-            if (empty($order->order_number)) {
-                $order->order_number = 'ORD-' . strtoupper(Str::random(8));
-            }
-        });
+        // Order number generation is now handled by CheckoutController
+        // to ensure proper sequence numbering per day
     }
 
     // Relationships
