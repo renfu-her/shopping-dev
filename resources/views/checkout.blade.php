@@ -84,20 +84,34 @@
                                         <input type="text" class="form-control" id="address" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="city" class="form-label">City *</label>
-                                        <input type="text" class="form-control" id="city" required>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label for="state" class="form-label">State *</label>
-                                        <select class="form-select" id="state" required>
-                                            <option value="">Select State</option>
-                                            <option value="NY">New York</option>
-                                            <option value="CA">California</option>
-                                            <option value="TX">Texas</option>
-                                            <option value="FL">Florida</option>
+                                        <label for="city" class="form-label">City/County *</label>
+                                        <select class="form-select" id="city" required>
+                                            <option value="">Select City/County</option>
+                                            <option value="Taipei City">Taipei City</option>
+                                            <option value="New Taipei City">New Taipei City</option>
+                                            <option value="Taoyuan City">Taoyuan City</option>
+                                            <option value="Taichung City">Taichung City</option>
+                                            <option value="Tainan City">Tainan City</option>
+                                            <option value="Kaohsiung City">Kaohsiung City</option>
+                                            <option value="Keelung City">Keelung City</option>
+                                            <option value="Hsinchu City">Hsinchu City</option>
+                                            <option value="Chiayi City">Chiayi City</option>
+                                            <option value="Hsinchu County">Hsinchu County</option>
+                                            <option value="Miaoli County">Miaoli County</option>
+                                            <option value="Changhua County">Changhua County</option>
+                                            <option value="Nantou County">Nantou County</option>
+                                            <option value="Yunlin County">Yunlin County</option>
+                                            <option value="Chiayi County">Chiayi County</option>
+                                            <option value="Pingtung County">Pingtung County</option>
+                                            <option value="Yilan County">Yilan County</option>
+                                            <option value="Hualien County">Hualien County</option>
+                                            <option value="Taitung County">Taitung County</option>
+                                            <option value="Penghu County">Penghu County</option>
+                                            <option value="Kinmen County">Kinmen County</option>
+                                            <option value="Lienchiang County">Lienchiang County</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-6">
                                         <label for="zipCode" class="form-label">ZIP Code *</label>
                                         <input type="text" class="form-control" id="zipCode" required>
                                     </div>
@@ -315,7 +329,6 @@
                     document.getElementById('phone').value = memberData.phone || '';
                     document.getElementById('address').value = memberData.address || '';
                     document.getElementById('city').value = memberData.city || '';
-                    document.getElementById('state').value = memberData.state || '';
                     document.getElementById('zipCode').value = memberData.postal_code || '';
                     
                     // Show a message that form was pre-filled
@@ -351,7 +364,6 @@
                             document.getElementById('phone').value = memberData.phone || '';
                             document.getElementById('address').value = memberData.address || '';
                             document.getElementById('city').value = memberData.city || '';
-                            document.getElementById('state').value = memberData.state || '';
                             document.getElementById('zipCode').value = memberData.postal_code || '';
                             
                             // Show a message that form was pre-filled
@@ -435,7 +447,7 @@
             }
 
             validateShippingForm() {
-                const requiredFields = ['fullName', 'email', 'phone', 'address', 'city', 'state', 'zipCode'];
+                const requiredFields = ['fullName', 'email', 'phone', 'address', 'city', 'zipCode'];
                 let isValid = true;
 
                 requiredFields.forEach(field => {
@@ -494,7 +506,6 @@
                     company: document.getElementById('company').value,
                     address: document.getElementById('address').value,
                     city: document.getElementById('city').value,
-                    state: document.getElementById('state').value,
                     zipCode: document.getElementById('zipCode').value,
                     saveAddress: document.getElementById('saveAddress').checked
                 };
@@ -537,7 +548,7 @@
                             <p>
                                 ${this.shippingData.fullName}<br>
                                 ${this.shippingData.address}<br>
-                                ${this.shippingData.city}, ${this.shippingData.state} ${this.shippingData.zipCode}<br>
+                                ${this.shippingData.city} ${this.shippingData.zipCode}<br>
                                 ${this.shippingData.phone}
                             </p>
                         </div>
