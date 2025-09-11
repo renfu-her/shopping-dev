@@ -20,7 +20,7 @@ final class BannersTable
                 Tables\Columns\ImageColumn::make('image')
                     ->imageSize(60)
                     ->square()
-                    ->visibility('public'),
+                    ->disk('public'),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
                     ->sortable(),

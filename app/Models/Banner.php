@@ -34,4 +34,15 @@ final class Banner extends Model
     {
         return $query->orderBy('sort_order', 'asc');
     }
+
+    public function getImageUrlAttribute(): string
+    {
+        // Handle both new WebP files and legacy sample images
+        if (str_starts_with($this->image, 'banners/')) {
+            return asset('storage/' . $this->image);
+        } else {
+            // For legacy sample images, return the direct path
+            return $this->image;
+        }
+    }
 }

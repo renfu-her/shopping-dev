@@ -13,6 +13,7 @@ use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 final class BannerForm
 {
@@ -61,16 +62,7 @@ final class BannerForm
                     })
                     ->deleteUploadedFileUsing(function ($file) {
                         if ($file) {
-                            \Illuminate\Support\Facades\Storage::disk('public')->delete($file);
-                        }
-                    })
-                    ->getUploadedFileUrlUsing(function ($file) {
-                        // Handle both new WebP files and legacy sample images
-                        if (str_starts_with($file, 'banners/')) {
-                            return \Illuminate\Support\Facades\Storage::disk('public')->url($file);
-                        } else {
-                            // For legacy sample images, return the direct path
-                            return $file;
+                            Storage::disk('public')->delete($file);
                         }
                     }),
 
