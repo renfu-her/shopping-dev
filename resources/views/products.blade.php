@@ -21,6 +21,41 @@
     <!-- Products Section -->
     <section class="py-5">
         <div class="container">
+            <!-- Search and Sort Controls - Full Width -->
+            <div class="row mb-4">
+                <div class="col-lg-3">
+                    <!-- Empty space to align with sidebar -->
+                </div>
+                <div class="col-lg-9">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" id="search-input" class="form-control"
+                                    placeholder="Search products...">
+                                <button class="btn btn-outline-secondary" type="button" id="search-btn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <select id="sort-select" class="form-select">
+                                <option value="created_at-desc">Newest First</option>
+                                <option value="created_at-asc">Oldest First</option>
+                                <option value="name-asc">Name A-Z</option>
+                                <option value="name-desc">Name Z-A</option>
+                                <option value="price-asc">Price Low to High</option>
+                                <option value="price-desc">Price High to Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-secondary w-100" id="clear-filters" style="display: none;">
+                                <i class="fas fa-times me-1"></i>Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row">
                 <!-- Sidebar - Category Filter -->
                 <div class="col-lg-3 mb-4">
@@ -54,33 +89,6 @@
 
                 <!-- Main Content -->
                 <div class="col-lg-9">
-                    <!-- Search and Sort Controls -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <input type="text" id="search-input" class="form-control"
-                                    placeholder="Search products...">
-                                <button class="btn btn-outline-secondary" type="button" id="search-btn">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <select id="sort-select" class="form-select">
-                                <option value="created_at-desc">Newest First</option>
-                                <option value="created_at-asc">Oldest First</option>
-                                <option value="name-asc">Name A-Z</option>
-                                <option value="name-desc">Name Z-A</option>
-                                <option value="price-asc">Price Low to High</option>
-                                <option value="price-desc">Price High to Low</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <button class="btn btn-outline-secondary w-100" id="clear-filters" style="display: none;">
-                                <i class="fas fa-times me-1"></i>Clear
-                            </button>
-                        </div>
-                    </div>
 
                     <!-- Results Header -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -247,6 +255,16 @@
         @media (max-width: 991.98px) {
             .col-lg-3 {
                 margin-bottom: 2rem;
+            }
+            
+            /* On mobile, make search controls full width */
+            .col-lg-3:first-child {
+                display: none;
+            }
+            
+            .col-lg-9:first-child {
+                flex: 0 0 100%;
+                max-width: 100%;
             }
         }
 
