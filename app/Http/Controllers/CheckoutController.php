@@ -44,8 +44,17 @@ final class CheckoutController extends Controller
 
             DB::beginTransaction();
 
+            // Get authenticated member
+            $member = Auth::guard('member-api')->user();
+            
+            if (!$member) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Authentication required'
+                ], 401);
+            }
+            
             // Get cart data
-            $member = Auth::guard('member')->user();
             $cart = Cart::where('member_id', $member->id)->first();
             
             if (!$cart || $cart->items()->count() === 0) {

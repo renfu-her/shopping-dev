@@ -62,12 +62,10 @@ Route::prefix('v1')->group(function () {
         Route::delete('/cart/coupon/remove', [CartController::class, 'removeCoupon']);
     });
 
-    // ECPay payment routes
-    Route::post('/orders/ecpay', [CheckoutController::class, 'createECPayOrder']);
 });
 
 // Protected routes (require authentication)
-Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
+Route::prefix('v1')->middleware('auth:member-api')->group(function () {
     // Authentication routes
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
@@ -93,6 +91,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
     // Order routes
     Route::post('/orders', [OrderController::class, 'store']);
+    Route::post('/orders/ecpay', [CheckoutController::class, 'createECPayOrder']);
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{order}', [OrderController::class, 'show']);
     Route::put('/orders/{order}/cancel', [OrderController::class, 'cancel']);
